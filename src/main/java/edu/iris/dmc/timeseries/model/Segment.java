@@ -76,7 +76,7 @@ public class Segment implements Serializable, Comparable<Segment> {
 	public long getStartTime() {
 		return startTime;
 	}
-
+	
 	public long getEndTime() {
 		return endTime;
 	}

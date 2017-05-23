@@ -1,6 +1,5 @@
 package edu.iris.dmc.service.response;
 
-import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
