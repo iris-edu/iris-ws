@@ -1,8 +1,6 @@
 package edu.iris.dmc.timeseries.model;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
-import java.util.LinkedList;
 import java.util.List;
 
 import edu.iris.dmc.seedcodec.Type;
