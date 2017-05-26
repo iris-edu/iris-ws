@@ -1,8 +1,10 @@
-package edu.iris.dmc.timeseries.model;
+package edu.iris.dmc.timeseries;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.List;
 
+import edu.iris.dmc.criteria.Strings;
 import edu.iris.dmc.seedcodec.Type;
 
 public class Segment implements Serializable, Comparable<Segment> {
@@ -63,7 +65,11 @@ public class Segment implements Serializable, Comparable<Segment> {
 		return this.data.get();
 	}
 
-	public long getExpectedNextSampleTime() {
+	public Timestamp getExpectedNextSampleTime() {
+		return new Timestamp(expectedNextSampleTime);
+	}
+
+	public long getExpectedNextSampleTimeAsLong() {
 		return expectedNextSampleTime;
 	}
 
@@ -71,11 +77,19 @@ public class Segment implements Serializable, Comparable<Segment> {
 		this.timeseries = ts;
 	}
 
-	public long getStartTime() {
+	public long getStartTimeAsLong() {
 		return startTime;
 	}
-	
-	public long getEndTime() {
+
+	public Timestamp getStartTime() {
+		return new Timestamp(startTime);
+	}
+
+	public Timestamp getEndTime() {
+		return new Timestamp(endTime);
+	}
+
+	public long getEndTimeAsLong() {
 		return endTime;
 	}
 
@@ -118,13 +132,20 @@ public class Segment implements Serializable, Comparable<Segment> {
 		if (ts == null) {
 			return -1;
 		}
-		if (this.startTime > ts.getStartTime()) {
+		if (this.startTime > ts.getStartTimeAsLong()) {
 			return 1;
-		} else if (this.startTime < ts.getStartTime()) {
+		} else if (this.startTime < ts.getStartTimeAsLong()) {
 			return -1;
 		} else {
 			return 0;
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "Segment [type=" + type + ", samplerate=" + samplerate + ", startTime=" + Strings.format(startTime) + ", endTime="
+				+ Strings.format(endTime) + ", expectedNextSampleTime=" + Strings.format(expectedNextSampleTime) + ", totalNumberOfSamples="
+				+ totalNumberOfSamples + ", timeseries=" + timeseries + "]";
 	}
 
 }

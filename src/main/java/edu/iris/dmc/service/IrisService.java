@@ -7,7 +7,6 @@ import java.util.List;
 
 import edu.iris.dmc.criteria.Criteria;
 import edu.iris.dmc.criteria.CriteriaException;
-import edu.iris.dmc.service.response.AutoCloseableIterator;
 
 public interface IrisService<T> {
 
@@ -20,10 +19,6 @@ public interface IrisService<T> {
 
 	public List<T> fetch(String url, String username, String password, ResponseHandler<T> handler)
 			throws IOException, CriteriaException, NoDataFoundException;
-
-	public AutoCloseableIterator<T> iterate(String url) throws IOException, NoDataFoundException;
-
-	public AutoCloseableIterator<T> iterate(InputStream inputStream) throws IOException, NoDataFoundException;
 
 	public void stream(String url, OutputStream out) throws NoDataFoundException, CriteriaException, IOException;
 

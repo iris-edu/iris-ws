@@ -14,20 +14,24 @@ public class Strings {
 
 	public static String format(long time) {
 		Timestamp ts = new Timestamp(time);
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 		return sdf.format(ts);
 	}
 
 	public static String format(Date date) {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 		return sdf.format(date);
 	}
 
 	public static Date format(String text) throws ParseException {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+		if (text.length() > 19) {
+			sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
+		}
+
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 		return sdf.parse(text);
 	}
 }

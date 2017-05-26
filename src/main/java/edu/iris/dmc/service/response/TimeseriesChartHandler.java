@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 import edu.iris.dmc.seedcodec.CodecException;
 import edu.iris.dmc.seedcodec.UnsupportedCompressionType;
 import edu.iris.dmc.service.ResponseHandler;
-import edu.iris.dmc.timeseries.model.Util;
+import edu.iris.dmc.timeseries.Util;
 import edu.sc.seis.seisFile.mseed.Blockette;
 import edu.sc.seis.seisFile.mseed.Blockette1001;
 import edu.sc.seis.seisFile.mseed.DataHeader;
@@ -82,22 +82,23 @@ public class TimeseriesChartHandler implements ResponseHandler<TimeseriesBuffere
 							DataHeader header = (DataHeader) dr.getControlHeader();
 
 							String key = header.getNetworkCode() + header.getStationIdentifier();
-							if (!layered) {
-								key = key + header.getLocationIdentifier() + header.getChannelIdentifier();
-							}
+							// if (!layered) {
+							String location = header.getLocationIdentifier() + header.getChannelIdentifier();
+							key = key + header.getLocationIdentifier() + header.getChannelIdentifier();
+							// }
 
-							TimeseriesBufferedImage timeseries = map.get(key);
+							TimeseriesBufferedImage image = map.get(key);
 
-							if (timeseries == null) {
-								timeseries = TimeseriesBufferedImage.from(header.getNetworkCode(),
+							if (image == null) {
+								image = TimeseriesBufferedImage.from(header.getNetworkCode(),
 										header.getStationIdentifier(), header.getLocationIdentifier(),
 										header.getChannelIdentifier(), this.width, this.height);
-								timeseries.showRecordLine(this.showRecordLine);
-								map.put(key, timeseries);
+								image.showRecordLine(this.showRecordLine);
+								map.put(key, image);
 							}
 							Timestamp startTime = Util.toTime(header.getStartBtime(), header.getActivityFlags(),
 									header.getTimeCorrection(), microseconds);
-							timeseries.add(startTime, dr, reduce);
+							image.add(location,startTime, dr, reduce);
 						} else {
 							// :TODO throw exception
 						}

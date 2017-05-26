@@ -1,4 +1,4 @@
-package edu.iris.dmc.timeseries.model;
+package edu.iris.dmc.timeseries;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -112,12 +112,12 @@ public class Timeseries implements Serializable {
 
 	public long getStartTime() {
 		Segment s = this.segments.get(0);
-		return s.getStartTime();
+		return s.getStartTimeAsLong();
 	}
 
 	public long getEndTime() {
 		Segment s = this.segments.get(this.segments.size() - 1);
-		return s.getEndTime();
+		return s.getEndTimeAsLong();
 	}
 
 	public float getSampleRate() {

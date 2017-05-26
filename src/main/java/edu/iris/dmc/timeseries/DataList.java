@@ -1,4 +1,4 @@
-package edu.iris.dmc.timeseries.model;
+package edu.iris.dmc.timeseries;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;

@@ -11,7 +11,9 @@ import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
@@ -19,9 +21,9 @@ import edu.iris.dmc.criteria.Strings;
 import edu.iris.dmc.seedcodec.CodecException;
 import edu.iris.dmc.seedcodec.Type;
 import edu.iris.dmc.seedcodec.UnsupportedCompressionType;
-import edu.iris.dmc.timeseries.model.DecompressedDataRecord;
-import edu.iris.dmc.timeseries.model.Segment;
-import edu.iris.dmc.timeseries.model.Timeseries;
+import edu.iris.dmc.timeseries.DecompressedDataRecord;
+import edu.iris.dmc.timeseries.Segment;
+import edu.iris.dmc.timeseries.Timeseries;
 import edu.sc.seis.seisFile.mseed.DataRecord;
 import edu.sc.seis.seisFile.mseed.SeedFormatException;
 
@@ -47,6 +49,7 @@ public class TimeseriesBufferedImage extends BufferedImage {
 
 	private static final Stroke GRAPH_STROKE = new BasicStroke(2f);
 
+	private Map<String, Timeseries> map = new HashMap<>();
 	private Timeseries timeseries;
 
 	private TimeseriesBufferedImage(Timeseries timeseries, int width, int height) {
@@ -63,13 +66,18 @@ public class TimeseriesBufferedImage extends BufferedImage {
 		return new TimeseriesBufferedImage(timeseries, width, height);
 	}
 
-	public void add(Timestamp startTimestamp, DataRecord record)
+	public void add(String location, Timestamp startTimestamp, DataRecord record)
 			throws UnsupportedCompressionType, CodecException, SeedFormatException {
-		this.add(startTimestamp, record, false);
+		this.add(location, startTimestamp, record, false);
 	}
 
-	public void add(Timestamp startTimestamp, DataRecord record, boolean reduce)
+	public void add(String location, Timestamp startTimestamp, DataRecord record, boolean reduce)
 			throws UnsupportedCompressionType, CodecException, SeedFormatException {
+
+		Timeseries ts = map.get(location);
+		if(ts==null){
+			
+		}
 		this.timeseries.add(record, reduce);
 	}
 
@@ -140,41 +148,39 @@ public class TimeseriesBufferedImage extends BufferedImage {
 
 		int offset = 0;
 
-		float xScale = ((float) getWidth() - (2 * padding) - labelPadding)
-				/ (this.timeseries.getTotalNumberOfSamples() - 1);
 		float yScale = ((float) getHeight() - 2 * padding - labelPadding)
 				/ (this.timeseries.getMax() - this.timeseries.getMin());
-
-		float x1 = 0;
-		float y1 = 0;
-		float scale = ((float) this.getWidth()) / this.timeseries.getActualNumberOfSamples();
-		// int scale1 = (int) (this.timeseries.getActualNumberOfSamples() /
-		// 1000);
-		// System.out.println(this.getWidth()+"
-		// "+this.timeseries.getActualNumberOfSamples()+"
-		// "+scale+"++++++++++++++");
-		paintScale(g2, scale);
+		double x1 = 0;
+		double y1 = 0;
+		float xScale = ((float) this.getWidth()) / this.timeseries.getActualNumberOfSamples();
+		paintScale(g2, xScale);
 		for (Segment s : this.timeseries.getSegments()) {
-			this.timeAxix(g2, s.getStartTime(), x1);
+			this.timeAxix(g2, s.getStartTimeAsLong(), x1);
 			for (DecompressedDataRecord d : s.getData()) {
 				float[] array = d.getRecord().getData();
+				if (this.showRecordLine) {
+					float x = ((offset + array.length) * xScale) + padding + labelPadding;
+					printRecordLine(g2, x, getHeight() - padding - labelPadding);
+					hoursAxix(g2, d.getEndTime(), x1);
+				}
+
 				for (int i = 0; i < array.length - 1; i++) {
-					x1 = (int) ((offset * scale) + padding + labelPadding);
-					y1 = (int) ((this.timeseries.getMax() - array[i]) * yScale + padding);
-					float x2 = ((offset * scale) + 1 + padding + labelPadding);
-					float y2 = ((this.timeseries.getMax() - array[i + 1]) * yScale + padding);
-					g2.draw(new Line2D.Double(x1, y1, x2, y2));
-					// System.out.println(x1 + "," + y1 + "," + x2 + "," + y2 +
-					// ", " + array[i]);
+					if (offset == 0) {
+						x1 = ((offset * xScale) + padding + labelPadding);
+						y1 = ((this.timeseries.getMax() - array[i]) * yScale + padding);
+					}
 
 					offset++;
+
+					double x2 = ((offset * xScale) + padding + labelPadding);
+					double y2 = ((this.timeseries.getMax() - array[i + 1]) * yScale + padding);
+
+					g2.draw(new Line2D.Double(x1, y1, x2, y2));
+
+					x1 = x2;
+					y1 = y2;
+
 				}
-				// this.timeAxix(g2, d.getStartTime(), d.getEndTime(), x1);
-				if (this.showRecordLine) {
-					printRecordLine(g2, x1, getHeight() - padding - labelPadding);
-				}
-				hoursAxix(g2, d.getEndTime(), x1);
-				g2.setColor(lineColor);
 			}
 			printSegmentLine(g2, x1, getHeight() - padding - labelPadding);
 			g2.setColor(lineColor);
@@ -182,8 +188,10 @@ public class TimeseriesBufferedImage extends BufferedImage {
 	}
 
 	private void printRecordLine(Graphics2D g2, double x, double height) {
+		Color originalColor = g2.getColor();
 		g2.setColor(RECORD_ENDING);
 		g2.draw(new Line2D.Double(x, labelPadding, x, height));
+		g2.setColor(originalColor);
 	}
 
 	private void printSegmentLine(Graphics2D g2, double x, int height) {
@@ -204,13 +212,14 @@ public class TimeseriesBufferedImage extends BufferedImage {
 
 	}
 
-	private float currentTimeAxis = padding + labelPadding;
+	private double currentTimeAxis = padding + labelPadding;
 
-	private void hoursAxix(Graphics2D g2, long end, float x1) {
+	private void hoursAxix(Graphics2D g2, long end, double x1) {
 
 		if (x1 - currentTimeAxis < 30) {
 			return;
 		}
+		Color originalColor = g2.getColor();
 		Font originalFont = g2.getFont();
 		Font newFont = originalFont.deriveFont(originalFont.getSize() * 0.8F);
 		g2.setFont(newFont);
@@ -224,19 +233,23 @@ public class TimeseriesBufferedImage extends BufferedImage {
 		String time = String.format("%02d", hour) + ":" + String.format("%02d", minute);
 
 		this.currentTimeAxis = x1 + g2.getFontMetrics().stringWidth(time);
-		g2.drawString(time, x1, getHeight() - ((padding + labelPadding) - 10));
+		g2.drawString(time, (int) x1, getHeight() - ((padding + labelPadding) - 10));
 		g2.setFont(originalFont);
+		g2.setColor(originalColor);
 	}
 
-	private void timeAxix(Graphics2D g2, long start, float x1) {
+	private void timeAxix(Graphics2D g2, long start, double x1) {
+		Color originalColor = g2.getColor();
 		Font originalFont = g2.getFont();
 		Font newFont = originalFont.deriveFont(originalFont.getSize() * 0.8F);
 		g2.setFont(newFont);
 		g2.setColor(Color.BLACK);
 		String time = Strings.format(start);
-		this.currentTimeAxis += g2.getFontMetrics().stringWidth(time);
-		g2.drawString(time, x1 + padding + labelPadding, getHeight() - ((padding + labelPadding) - 10));
+
+		g2.drawString(time, (int) x1 + padding + labelPadding, getHeight() - ((padding + labelPadding) - 10));
+		this.currentTimeAxis += g2.getFontMetrics().stringWidth(time) + padding + labelPadding;
 		g2.setFont(originalFont);
+		g2.setColor(originalColor);
 	}
 
 	private void footNote(Graphics2D g2) {
@@ -259,7 +272,7 @@ public class TimeseriesBufferedImage extends BufferedImage {
 			return 0;
 		}
 		Segment s = this.timeseries.getSegments().get(0);
-		return s.getStartTime();
+		return s.getStartTimeAsLong();
 	}
 
 	public long getEndTime() {
@@ -267,7 +280,7 @@ public class TimeseriesBufferedImage extends BufferedImage {
 			return 0;
 		}
 		Segment s = this.timeseries.getSegments().get(this.timeseries.getSegments().size() - 1);
-		return s.getEndTime();
+		return s.getEndTimeAsLong();
 	}
 
 	public float getSampleRate() {

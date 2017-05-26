@@ -19,8 +19,8 @@ import edu.iris.dmc.criteria.WaveformSearchCriteria;
 import edu.iris.dmc.seedcodec.Type;
 import edu.iris.dmc.service.IrisService;
 import edu.iris.dmc.service.ServiceFactory;
-import edu.iris.dmc.timeseries.model.Segment;
-import edu.iris.dmc.timeseries.model.Timeseries;
+import edu.iris.dmc.timeseries.Segment;
+import edu.iris.dmc.timeseries.Timeseries;
 import edu.iris.dmc.service.NoDataFoundException;
 
 public class TimeseriesServiceFetchTest {
@@ -98,29 +98,11 @@ public class TimeseriesServiceFetchTest {
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
 		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-
+		System.out.println("SEGMENT1: "+segment1);
 		assertEquals(sdf.parse("2009-02-23T00:00:00.000019"), segment1.getStartTime());
-		assertEquals(sdf.parse("2009-02-24T15:10:27.000369"), segment1.getEndTime());
-		assertEquals(sdf.parse("2009-02-24T15:10:27.000419"), segment1.getExpectedNextSampleTime());
+		assertEquals(sdf.parse("2009-02-24T23:59:59.000969"), segment1.getEndTime());
+		assertEquals(sdf.parse("2009-02-25T00:00:00.000019"), segment1.getExpectedNextSampleTime());
 		assertEquals(20.0, segment1.getSamplerate(), DELTA);
-
-		Segment segment2 = ts.getSegments().get(1);
-		assertEquals(segment2.getTotalNumberOfSamples(), segment2.getTotalNumberOfSamples());
-		assertEquals(segment2.getType(), ts.getType());
-		assertEquals(14040, segment2.getTotalNumberOfSamples());
-		assertEquals(sdf.parse("2009-02-24T15:36:59.000419"), segment2.getStartTime());
-		assertEquals(sdf.parse("2009-02-24T15:48:41.000369"), segment2.getEndTime());
-		assertEquals(sdf.parse("2009-02-24T15:48:41.000419"), segment2.getExpectedNextSampleTime());
-		assertEquals(20.0, segment2.getSamplerate(), DELTA);
-
-		Segment segment3 = ts.getSegments().get(2);
-		assertEquals(segment3.getTotalNumberOfSamples(), segment3.getTotalNumberOfSamples());
-		assertEquals(segment3.getType(), ts.getType());
-		assertEquals(589512, segment3.getTotalNumberOfSamples());
-		assertEquals(sdf.parse("2009-02-24T15:48:44.000419"), segment3.getStartTime());
-		assertEquals(sdf.parse("2009-02-24T23:59:59.000969"), segment3.getEndTime());
-		assertEquals(sdf.parse("2009-02-25T00:00:00.000019"), segment3.getExpectedNextSampleTime());
-		assertEquals(20.0, segment3.getSamplerate(), DELTA);
 
 	}
 
@@ -145,6 +127,7 @@ public class TimeseriesServiceFetchTest {
 		assertEquals(1, ts.getSegments().size());
 
 		Segment segment1 = ts.getSegments().get(0);
+		System.out.println("this: "+segment1);
 		assertEquals(segment1.getTotalNumberOfSamples(), segment1.getTotalNumberOfSamples());
 		assertEquals(segment1.getType(), ts.getType());
 		assertEquals(3424100, segment1.getTotalNumberOfSamples());
@@ -153,27 +136,10 @@ public class TimeseriesServiceFetchTest {
 		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
 		assertEquals(sdf.parse("2009-02-23T00:00:00.000019"), segment1.getStartTime());
-		assertEquals(sdf.parse("2009-02-24T15:10:27.000369"), segment1.getEndTime());
-		assertEquals(sdf.parse("2009-02-24T15:10:27.000419"), segment1.getExpectedNextSampleTime());
+		assertEquals(sdf.parse("2009-02-24T23:59:59.000969"), segment1.getEndTime());
+		assertEquals(sdf.parse("2009-02-25T00:00:00.000019"), segment1.getExpectedNextSampleTime());
 		assertEquals(20.0, segment1.getSamplerate(), DELTA);
 
-		Segment segment2 = ts.getSegments().get(1);
-		assertEquals(segment2.getTotalNumberOfSamples(), segment2.getTotalNumberOfSamples());
-		assertEquals(segment2.getType(), ts.getType());
-		assertEquals(14040, segment2.getTotalNumberOfSamples());
-		assertEquals(sdf.parse("2009-02-24T15:36:59.000419"), segment2.getStartTime());
-		assertEquals(sdf.parse("2009-02-24T15:48:41.000369"), segment2.getEndTime());
-		assertEquals(sdf.parse("2009-02-24T15:48:41.000419"), segment2.getExpectedNextSampleTime());
-		assertEquals(20.0, segment2.getSamplerate(), DELTA);
-
-		Segment segment3 = ts.getSegments().get(2);
-		assertEquals(segment3.getTotalNumberOfSamples(), segment3.getTotalNumberOfSamples());
-		assertEquals(segment3.getType(), ts.getType());
-		assertEquals(589512, segment3.getTotalNumberOfSamples());
-		assertEquals(sdf.parse("2009-02-24T15:48:44.000419"), segment3.getStartTime());
-		assertEquals(sdf.parse("2009-02-24T23:59:59.000969"), segment3.getEndTime());
-		assertEquals(sdf.parse("2009-02-25T00:00:00.000019"), segment3.getExpectedNextSampleTime());
-		assertEquals(20.0, segment3.getSamplerate(), DELTA);
 
 	}
 
@@ -199,9 +165,9 @@ public class TimeseriesServiceFetchTest {
 			assertEquals(s.getTotalNumberOfSamples(), s.getTotalNumberOfSamples());
 			System.out.println(s);
 			System.out.println(s.getType());
-			System.out.println(s.getStartTime());
-			System.out.println(s.getEndTime());
-			System.out.println(s.getExpectedNextSampleTime());
+			System.out.println(s.getStartTimeAsLong());
+			System.out.println(s.getEndTimeAsLong());
+			System.out.println(s.getExpectedNextSampleTimeAsLong());
 			System.out.println(s.getSamplerate());
 			System.out.println(s.getData().size() + "   " + s.getTotalNumberOfSamples());
 		}
@@ -235,7 +201,7 @@ public class TimeseriesServiceFetchTest {
 		Segment s = segments.get(0);
 		assertEquals("STEIM2", s.getType().name());
 
-		System.out.println(sdf.format(s.getExpectedNextSampleTime()));
+		System.out.println(sdf.format(s.getExpectedNextSampleTimeAsLong()));
 		assertEquals(sdf.parse("1998-10-26T10:00:00.000040"), s.getStartTime());
 		assertEquals(sdf.parse("1998-10-26T11:59:59.000990"), s.getEndTime());
 		assertEquals(sdf.parse("1998-10-26T12:00:00.000040"), s.getExpectedNextSampleTime());

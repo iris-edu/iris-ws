@@ -1,13 +1,14 @@
-package edu.iris.dmc.timeseries.model;
+package edu.iris.dmc.timeseries;
 
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import edu.sc.seis.seisFile.mseed.Btime;
+import edu.sc.seis.seisFile.mseed.DataHeader;
+import edu.sc.seis.seisFile.mseed.DataRecord;
 
 public class Util {
 
@@ -56,10 +57,6 @@ public class Util {
 			timeStamp = new Timestamp(cal.getTime().getTime());
 			timeStamp.setNanos(1000000000 + remainderNanos);
 		}
-
-		SimpleDateFormat dfm = new SimpleDateFormat("yyyy,D,HH:mm:ss");
-		dfm.setTimeZone(TimeZone.getTimeZone("GMT"));
-
 		return roundTime(timeStamp);
 	}
 
