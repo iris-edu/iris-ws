@@ -76,6 +76,7 @@ public class StationXMLParser extends AbstractStationParser {
 			JAXBContext jc = JAXBContext
 					.newInstance(edu.iris.dmc.fdsn.station.model.ObjectFactory.class);
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
+
 			//StartElement se = (StartElement) xmlEventFilteredReader.nextEvent();
 
 			List<edu.iris.dmc.fdsn.station.model.Network> networks = new ArrayList<edu.iris.dmc.fdsn.station.model.Network>();

@@ -33,7 +33,10 @@ import edu.iris.dmc.fdsn.station.model.Site;
 import edu.iris.dmc.fdsn.station.model.Station;
 import edu.iris.dmc.fdsn.station.model.Units;
 import edu.iris.dmc.service.NoDataFoundException;
+import edu.iris.dmc.service.ServiceNotSupportedException;
+import edu.iris.dmc.service.ServiceUtil;
 import edu.iris.dmc.service.StationIterator;
+import edu.iris.dmc.service.StationService;
 
 public class TextStreamUtil {
 
@@ -269,6 +272,55 @@ public class TextStreamUtil {
 				TimeZone.getTimeZone("GMT"));
 		calendar.setTime(date);
 		return calendar;
+	}
+
+	public static void main1(String[] args) throws NoDataFoundException,
+			CriteriaException, ServiceNotSupportedException {
+		ServiceUtil util = ServiceUtil.getInstance();
+		StationService service = util.getStationService();
+		// try {
+		FileInputStream inputStream;
+		try {
+			StationIterator iterator = service
+					.iterate("http://service.iris.edu/fdsnws/station/1/query?net=IU&sta=AN*&level=sta&cha=BHZ&loc=*&format=xml");
+
+			while (iterator.hasNext()) {
+				Station s = iterator.next();
+				System.out.println(s);
+				if (s.getChannels() != null) {
+					for (Channel c : s.getChannels()) {
+						System.out.println("\t" + c);
+					}
+				}
+			}
+
+			if (iterator != null) {
+				iterator.close();
+			}
+
+			List<Network> list = service
+					.fetch("http://service.iris.edu/fdsnws/station/1/query?net=IU&sta=AN*&level=net&cha=BHZ&loc=*&format=xml");
+			for (Network network : list) {
+				System.out.println(network);
+				if (network.getStations() != null) {
+					for (Station station : network.getStations()) {
+						System.out.println("\t" + station);
+						if (station.getChannels() != null) {
+							for (Channel c : station.getChannels()) {
+								System.out.println("\t" + c);
+							}
+						}
+					}
+				}
+			}
+
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

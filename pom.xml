@@ -76,7 +76,7 @@
 		<dependency>
 			<groupId>edu.iris.fdsn.station</groupId>
 			<artifactId>fdsn-stationxml-model</artifactId>
-			<version>1.4.3-SNAPSHOT</version>
+			<version>1.4.3</version>
 		</dependency>
 		<dependency>
 			<groupId>edu.iris</groupId>

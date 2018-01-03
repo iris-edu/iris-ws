@@ -9,17 +9,17 @@ public class DateUtil {
 
 	private static String SHORTDATE = "yyyy-MM-dd";
 	private static String LONGDATE = "yyyy-MM-dd'T'HH:mm:ss";
-	public static SimpleDateFormat SHORTDF = new SimpleDateFormat(SHORTDATE);
-	public static SimpleDateFormat LONGDF = new SimpleDateFormat(LONGDATE);
+	//public static SimpleDateFormat SHORTDF = new SimpleDateFormat(SHORTDATE);
+	//public static SimpleDateFormat LONGDF = new SimpleDateFormat(LONGDATE);
 	
 	public static Date parse(String string) throws ParseException{
 		if(string == null){
 			return null;
 		}
 		
-		SimpleDateFormat sdf = SHORTDF;
+		SimpleDateFormat sdf =  new SimpleDateFormat(SHORTDATE);
 		if(string.length()>SHORTDATE.length()){
-			sdf = LONGDF;
+			sdf = new SimpleDateFormat(LONGDATE);
 		}
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 		Date date = sdf.parse(string);
@@ -31,7 +31,7 @@ public class DateUtil {
 			return null;
 		}
 		
-		SimpleDateFormat sdf = LONGDF;
+		SimpleDateFormat sdf = new SimpleDateFormat(LONGDATE);
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 		return sdf.format(date);
 	}

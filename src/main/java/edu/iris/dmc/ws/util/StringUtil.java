@@ -1,6 +1,7 @@
 package edu.iris.dmc.ws.util;
 
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Scanner;
@@ -8,19 +9,16 @@ import java.util.Scanner;
 public class StringUtil {
 
 	public static String toString(InputStream inputStream) {
-		if (inputStream == null) {
-			return "";
+		Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
+		StringBuilder builder = new StringBuilder();
+		while (scanner.hasNext()) {
+			builder.append(scanner.next());
 		}
-		try (Scanner scanner = new Scanner(inputStream)) {// .useDelimiter("\\A");
-			StringBuilder builder = new StringBuilder();
-			while (scanner.hasNext()) {
-				builder.append(scanner.next());
-			}
-			return builder.toString();
-		}
+		return builder.toString();
 	}
 
-	public static URI createURI(final String scheme, final String host, int port, final String path, final String query,
+	public static URI createURI(final String scheme, final String host,
+			int port, final String path, final String query,
 			final String fragment) throws URISyntaxException {
 
 		StringBuilder buffer = new StringBuilder();
