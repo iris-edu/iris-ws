@@ -1,22 +1,17 @@
 package edu.iris.dmc.ws.util;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 
-import edu.iris.dmc.criteria.CriteriaException;
 import edu.iris.dmc.fdsn.station.model.Azimuth;
 import edu.iris.dmc.fdsn.station.model.Channel;
 import edu.iris.dmc.fdsn.station.model.Dip;
@@ -32,16 +27,10 @@ import edu.iris.dmc.fdsn.station.model.Sensitivity;
 import edu.iris.dmc.fdsn.station.model.Site;
 import edu.iris.dmc.fdsn.station.model.Station;
 import edu.iris.dmc.fdsn.station.model.Units;
-import edu.iris.dmc.service.NoDataFoundException;
-import edu.iris.dmc.service.ServiceNotSupportedException;
-import edu.iris.dmc.service.ServiceUtil;
-import edu.iris.dmc.service.StationIterator;
-import edu.iris.dmc.service.StationService;
 
 public class TextStreamUtil {
 
-	static protected SimpleDateFormat sdf = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ss");
+	
 	private static ObjectFactory objectFactory = new ObjectFactory();
 	private static DatatypeFactory datatypeFactory;
 	static {
@@ -72,13 +61,11 @@ public class TextStreamUtil {
 		network.setDescription(columns.get(1));
 
 		try {
-			network.setStartDate(datatypeFactory
-					.newXMLGregorianCalendar(TextStreamUtil.toDate(columns
-							.get(2))));
+			network.setStartDate(TextStreamUtil.toDate(columns
+							.get(2)));
 
-			network.setEndDate(datatypeFactory
-					.newXMLGregorianCalendar(TextStreamUtil.toDate(columns
-							.get(3))));
+			network.setEndDate(TextStreamUtil.toDate(columns
+							.get(3)));
 		} catch (ParseException e) {
 			throw new IOException(e);
 		}
@@ -133,14 +120,12 @@ public class TextStreamUtil {
 		}
 
 		try {
-			station.setStartDate(datatypeFactory
-					.newXMLGregorianCalendar(TextStreamUtil.toDate(columns
-							.get(5))));
+			station.setStartDate(TextStreamUtil.toDate(columns
+							.get(5)));
 
 			if (columns.size() > 6) {
-				station.setEndDate(datatypeFactory
-						.newXMLGregorianCalendar(TextStreamUtil.toDate(columns
-								.get(6))));
+				station.setEndDate(TextStreamUtil.toDate(columns
+								.get(6)));
 			}
 		} catch (ParseException e) {
 			throw new IOException(e);
@@ -250,13 +235,11 @@ public class TextStreamUtil {
 
 		try {
 			s = list.get(13);
-			channel.setStartDate(datatypeFactory
-					.newXMLGregorianCalendar(TextStreamUtil.toDate(s)));
+			channel.setStartDate(TextStreamUtil.toDate(s));
 
 			if (list.size() > 14) {
 				s = list.get(14);
-				channel.setEndDate(datatypeFactory
-						.newXMLGregorianCalendar(TextStreamUtil.toDate(s)));
+				channel.setEndDate(TextStreamUtil.toDate(s));
 			}
 		} catch (ParseException e) {
 			throw new IOException(e);
@@ -264,63 +247,11 @@ public class TextStreamUtil {
 		return channel;
 	}
 
-	private static GregorianCalendar toDate(String string)
+	private static Date toDate(String string)
 			throws ParseException {
 		DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		format.setTimeZone(TimeZone.getTimeZone("UTC"));
 		Date date = format.parse(string);
-		GregorianCalendar calendar = new GregorianCalendar(
-				TimeZone.getTimeZone("GMT"));
-		calendar.setTime(date);
-		return calendar;
+		return date;
 	}
-
-	public static void main1(String[] args) throws NoDataFoundException,
-			CriteriaException, ServiceNotSupportedException {
-		ServiceUtil util = ServiceUtil.getInstance();
-		StationService service = util.getStationService();
-		// try {
-		FileInputStream inputStream;
-		try {
-			StationIterator iterator = service
-					.iterate("http://service.iris.edu/fdsnws/station/1/query?net=IU&sta=AN*&level=sta&cha=BHZ&loc=*&format=xml");
-
-			while (iterator.hasNext()) {
-				Station s = iterator.next();
-				System.out.println(s);
-				if (s.getChannels() != null) {
-					for (Channel c : s.getChannels()) {
-						System.out.println("\t" + c);
-					}
-				}
-			}
-
-			if (iterator != null) {
-				iterator.close();
-			}
-
-			List<Network> list = service
-					.fetch("http://service.iris.edu/fdsnws/station/1/query?net=IU&sta=AN*&level=net&cha=BHZ&loc=*&format=xml");
-			for (Network network : list) {
-				System.out.println(network);
-				if (network.getStations() != null) {
-					for (Station station : network.getStations()) {
-						System.out.println("\t" + station);
-						if (station.getChannels() != null) {
-							for (Channel c : station.getChannels()) {
-								System.out.println("\t" + c);
-							}
-						}
-					}
-				}
-			}
-
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
 }

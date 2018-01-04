@@ -259,12 +259,10 @@ public class Metadata {
 					}
 
 					if (c.getStartDate() != null) {
-						md.startDate = c.getStartDate().toGregorianCalendar()
-								.getTime();
+						md.startDate = c.getStartDate();
 					}
 					if (c.getEndDate() != null) {
-						md.endDate = c.getEndDate().toGregorianCalendar()
-								.getTime();
+						md.endDate = c.getEndDate();
 					}
 					lmd.add(md);
 				}

@@ -4,7 +4,7 @@
 	<groupId>edu.iris.dmc</groupId>
 	<artifactId>IRIS-WS</artifactId>
 	<packaging>jar</packaging>
-	<version>3.0.1-SNAPSHOT</version>
+	<version>2.0.16-SNAPSHOT</version>
 	<name>FDSN-IRIS-WS</name>
 	<url>http://maven.apache.org</url>
 	<build>
@@ -74,9 +74,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>edu.iris.fdsn.station</groupId>
+			<groupId>edu.iris.dmc</groupId>
 			<artifactId>fdsn-stationxml-model</artifactId>
-			<version>1.4.3</version>
+			<version>1.4.4</version>
 		</dependency>
 		<dependency>
 			<groupId>edu.iris</groupId>
@@ -101,7 +101,7 @@
 			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 
 
 	</dependencies>

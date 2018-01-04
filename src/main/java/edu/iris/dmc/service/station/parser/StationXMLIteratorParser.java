@@ -178,18 +178,10 @@ public class StationXMLIteratorParser extends XMLFilterImpl implements
 											"yyyy-MM-dd'T'HH:mm:ss");
 									try {
 										Date date = sdf.parse(startString);
-										GregorianCalendar c = new GregorianCalendar();
-										c.setTime(date);
-										XMLGregorianCalendar cal2 = DatatypeFactory
-												.newInstance()
-												.newXMLGregorianCalendar(c);
-										network.setStartDate(cal2);
+										network.setStartDate(date);
 									} catch (ParseException e1) {
 										// TODO Auto-generated catch block
 										e1.printStackTrace();
-									} catch (DatatypeConfigurationException e2) {
-										// TODO Auto-generated catch block
-										e2.printStackTrace();
 									}
 								}
 							} else if (attributeName.equals("endDate")) {
@@ -204,7 +196,7 @@ public class StationXMLIteratorParser extends XMLFilterImpl implements
 										XMLGregorianCalendar cal2 = DatatypeFactory
 												.newInstance()
 												.newXMLGregorianCalendar(c);
-										network.setEndDate(cal2);
+										network.setEndDate(date);
 									} catch (ParseException e1) {
 										// TODO Auto-generated catch block
 										e1.printStackTrace();

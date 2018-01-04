@@ -192,7 +192,7 @@ public class StationXMLParser extends AbstractStationParser {
 										XMLGregorianCalendar cal2 = DatatypeFactory
 												.newInstance()
 												.newXMLGregorianCalendar(c);
-										network.setStartDate(cal2);
+										network.setStartDate(date);
 									} catch (ParseException e1) {
 										// TODO Auto-generated catch block
 										e1.printStackTrace();
@@ -213,7 +213,7 @@ public class StationXMLParser extends AbstractStationParser {
 										XMLGregorianCalendar cal2 = DatatypeFactory
 												.newInstance()
 												.newXMLGregorianCalendar(c);
-										network.setEndDate(cal2);
+										network.setEndDate(date);
 									} catch (ParseException e1) {
 										// TODO Auto-generated catch block
 										e1.printStackTrace();
