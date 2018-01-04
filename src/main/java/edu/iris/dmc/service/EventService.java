@@ -110,11 +110,11 @@ public class EventService extends BaseService {
 			ServiceNotSupportedException {
 		StringBuilder paramsString = new StringBuilder(criteria.toUrlParams()
 				.get(0));
-		return this.fetch(this.baseUrl + "query?" + paramsString.toString(), false);
+		return this.fetch(this.baseUrl + "query?" + paramsString.toString());
 
 	}
 
-	public List<Event> fetch(String url, boolean doVersionCheck)
+	public List<Event> fetch(String url)
 			throws NoDataFoundException, CriteriaException, IOException,
 			ServiceNotSupportedException {
 		if (logger.isLoggable(Level.FINER)) {
@@ -122,9 +122,7 @@ public class EventService extends BaseService {
 					"fetch(String url, boolean doVersionCheck)",
 					new Object[] { url });
 		}
-		if (doVersionCheck) {
-			this.validateVersion(url);
-		}
+
 		HttpURLConnection connection = null;
 
 		try {
@@ -220,24 +218,6 @@ public class EventService extends BaseService {
 		}
 	}
 
-	/**
-	 * fetch events from IRIS event service
-	 * 
-	 * @param criteria
-	 * @return list of events
-	 * @throws NoDataFoundException
-	 * @throws CriteriaException
-	 * @throws ServiceNotSupportedException
-	 */
-	public List<Event> fetch(String url) throws NoDataFoundException,
-			CriteriaException, IOException, ServiceNotSupportedException {
-		if (logger.isLoggable(Level.FINER)) {
-			logger.entering(this.getClass().getName(), "fetch(String url)",
-					new Object[] { url });
-		}
-		return this.fetch(url, false);
-
-	}
 
 	/**
 	 * Load events from inputstream, example local file

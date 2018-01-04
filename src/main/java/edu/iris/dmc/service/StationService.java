@@ -27,7 +27,9 @@ import edu.iris.dmc.criteria.OutputLevel;
 import edu.iris.dmc.criteria.StationCriteria;
 import edu.iris.dmc.fdsn.station.model.FDSNStationXML;
 import edu.iris.dmc.fdsn.station.model.Network;
+import edu.iris.dmc.service.station.parser.IterableNetworkParser;
 import edu.iris.dmc.service.station.parser.IterableStationParser;
+import edu.iris.dmc.service.station.parser.NetworkTextIteratorParser;
 import edu.iris.dmc.service.station.parser.StationParser;
 import edu.iris.dmc.service.station.parser.StationTextIteratorParser;
 import edu.iris.dmc.service.station.parser.StationTextParser;
@@ -106,6 +108,78 @@ public class StationService extends BaseService {
 	 * StationIterator(new StationXMLParser(is, null)); }
 	 */
 
+	public NetworkIterator iterateNetworks(Criteria criteria, OutputLevel level)
+			throws NoDataFoundException, CriteriaException, IOException, ServiceNotSupportedException {
+		
+
+		((StationCriteria)criteria).setFormat(OutputFormat.TEXT);
+		StringBuilder paramsString = new StringBuilder(criteria.toUrlParams().get(0));
+		String urlString = this.baseUrl + "query?" + paramsString.toString() + "&level=network";
+
+		HttpURLConnection connection = null;
+		InputStream inputStream = null;
+
+		connection = getConnection(urlString);
+		connection.setRequestMethod("GET");
+
+		String uAgent = this.userAgent;
+		if (this.getAppName() != null && !"".equals(this.appName)) {
+			uAgent = uAgent + " (" + this.appName + ")";
+		}
+		connection.setRequestProperty("User-Agent", uAgent);
+
+		connection.setRequestProperty("Accept", "application/xml");
+		connection.setRequestProperty("Accept-Encoding", "gzip, deflate");
+		connection.connect();
+
+		int responseCode = connection.getResponseCode();
+		inputStream = responseCode != HTTP_OK ? connection.getErrorStream() : connection.getInputStream();
+		if ("gzip".equals(connection.getContentEncoding())) {
+			inputStream = new GZIPInputStream(inputStream);
+		}
+		switch (responseCode) {
+		case 404:
+			if (logger.isLoggable(WARNING))
+				logger.warning("No data Found for the GET request " + urlString + StringUtil.toString(inputStream));
+			return null;
+		case 204:
+			if (logger.isLoggable(WARNING))
+				logger.warning("No data Found for the GET request " + urlString);
+			if (inputStream != null) {
+				inputStream.close();
+			}
+			throw new NoDataFoundException("No data found for: " + urlString);
+		case 400:
+			if (logger.isLoggable(SEVERE))
+				logger.severe(
+						"An error occurred while making a GET request " + urlString + StringUtil.toString(inputStream));
+			throw new CriteriaException("Bad request parameter: " + StringUtil.toString(inputStream));
+		case 429:
+			if (logger.isLoggable(SEVERE))
+				logger.severe("Too Many Requests");
+			try {
+				inputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			throw new IOException("Too Many Requests");
+		case 500:
+			if (logger.isLoggable(WARNING))
+				logger.severe(
+						"An error occurred while making a GET request " + urlString + StringUtil.toString(inputStream));
+			throw new IOException(StringUtil.toString(inputStream));
+		case 200:
+			IterableNetworkParser parser = new NetworkTextIteratorParser(inputStream, level);
+			return new NetworkIterator(connection, parser);
+		default:
+			String message = connection.getResponseMessage();
+			if (connection != null) {
+				connection.disconnect();
+			}
+			throw new IOException(message);
+		}
+	}
+
 	/**
 	 * Iterate over list of stations based on the criteria provided
 	 * 
@@ -144,7 +218,7 @@ public class StationService extends BaseService {
 		return new StationIterator(new StationXMLIteratorParser(inputStream, OutputLevel.RESPONSE));
 	}
 
-	public StationIterator iterate(String url, boolean doVersionCheck)
+	public StationIterator iterate(String url)
 			throws NoDataFoundException, CriteriaException, IOException, ServiceNotSupportedException {
 		if (logger.isLoggable(Level.FINER)) {
 			logger.entering(this.getClass().getName(), "fetch(String url)", new Object[] { url });
@@ -160,9 +234,6 @@ public class StationService extends BaseService {
 		}
 
 		OutputLevel level = extractLevel(queryKeyValue);
-		if (doVersionCheck) {
-			this.validateVersion(url);
-		}
 		HttpURLConnection connection = null;
 		InputStream inputStream = null;
 
@@ -203,6 +274,9 @@ public class StationService extends BaseService {
 		case 429:
 			if (logger.isLoggable(SEVERE))
 				logger.severe("Too Many Requests");
+			if (inputStream != null) {
+				inputStream.close();
+			}
 			throw new IOException("Too Many Requests");
 		case 500:
 			if (logger.isLoggable(WARNING))
@@ -221,20 +295,7 @@ public class StationService extends BaseService {
 
 	}
 
-	/**
-	 * Iterate over list of stations based on the url provided
-	 * 
-	 * @param url
-	 * @return
-	 * @throws NoDataFoundException
-	 * @throws CriteriaException
-	 * @throws IOException
-	 * @throws ServiceNotSupportedException
-	 */
-	public StationIterator iterate(String url)
-			throws NoDataFoundException, CriteriaException, IOException, ServiceNotSupportedException {
-		return this.iterate(url, true);
-	}
+
 
 	/**
 	 * Load Networks from inputstream, example local file
@@ -310,22 +371,8 @@ public class StationService extends BaseService {
 
 	}
 
-	/**
-	 * Find stations from the url provided.
-	 * 
-	 * @param url
-	 * @return
-	 * @throws NoDataFoundException
-	 * @throws CriteriaException
-	 * @throws IOException
-	 * @throws ServiceNotSupportedException
-	 */
-	public List<Network> fetch(String url)
-			throws NoDataFoundException, CriteriaException, IOException, ServiceNotSupportedException {
-		return this.fetch(url, true);
-	}
 
-	public List<Network> fetch(String url, boolean doVersionCheck)
+	public List<Network> fetch(String url)
 			throws NoDataFoundException, CriteriaException, IOException, ServiceNotSupportedException {
 		if (logger.isLoggable(Level.FINER)) {
 			logger.entering(this.getClass().getName(), "fetch(String url)", new Object[] { url });
@@ -346,10 +393,6 @@ public class StationService extends BaseService {
 		}
 
 		OutputLevel level = extractLevel(queryKeyValue);
-
-		if (doVersionCheck) {
-			this.validateVersion(url);
-		}
 		StationParser parser = null;
 
 		List<Network> result = null;

@@ -247,7 +247,7 @@ public class TextStreamUtil {
 		return channel;
 	}
 
-	private static Date toDate(String string)
+	public static Date toDate(String string)
 			throws ParseException {
 		DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		format.setTimeZone(TimeZone.getTimeZone("UTC"));

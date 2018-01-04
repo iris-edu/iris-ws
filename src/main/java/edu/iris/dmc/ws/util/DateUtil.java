@@ -26,6 +26,17 @@ public class DateUtil {
 		return date;
 	}
 	
+	public static Date parse(String string, String pattern) throws ParseException{
+		if(string == null){
+			return null;
+		}
+		
+		SimpleDateFormat sdf =  new SimpleDateFormat(pattern);
+		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+		Date date = sdf.parse(string);
+		return date;
+	}
+	
 	public static String format(Date date){
 		if(date == null){
 			return null;

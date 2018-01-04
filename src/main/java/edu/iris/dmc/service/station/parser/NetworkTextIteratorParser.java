@@ -4,7 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigInteger;
+import java.text.ParseException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import edu.iris.dmc.criteria.OutputLevel;
@@ -12,7 +15,7 @@ import edu.iris.dmc.fdsn.station.model.Network;
 import edu.iris.dmc.fdsn.station.model.Station;
 import edu.iris.dmc.ws.util.TextStreamUtil;
 
-public class StationTextIteratorParser implements IterableStationParser {
+public class NetworkTextIteratorParser implements IterableNetworkParser {
 
 	protected InputStream inputStream;
 	private boolean isClosed = false;
@@ -22,7 +25,7 @@ public class StationTextIteratorParser implements IterableStationParser {
 	private Network network;
 	private Station station;
 
-	public StationTextIteratorParser(InputStream is, OutputLevel level) {
+	public NetworkTextIteratorParser(InputStream is, OutputLevel level) {
 		this.inputStream = is;
 		this.level = level;
 		this.reader = new BufferedReader(new InputStreamReader(inputStream));
@@ -34,7 +37,7 @@ public class StationTextIteratorParser implements IterableStationParser {
 		if (this.lineRead != null) {
 			return this.lineRead;
 		}
-		if(this.isClosed){
+		if (this.isClosed) {
 			return null;
 		}
 		for (;;) {
@@ -52,59 +55,51 @@ public class StationTextIteratorParser implements IterableStationParser {
 	}
 
 	// @Override
-	public Station next() {
-		String line = null;
+	public Network next() {
+		String line;
 		try {
-			while ((line = getLine()) != null) {
-				String[] columns = line.split("\\|");
-				if (columns.length < 7) {
-					throw new IOException("Invalid format: [" + line + "]");
-				}
+			line = getLine();
 
-				if (network == null || !network.getCode().equals(columns[0])) {
-					network = new Network();
-					network.setCode(columns[0]);
-				}
-
-				if (level == OutputLevel.STATION) {
-					List<String> list = Arrays.asList(Arrays.copyOfRange(columns, 1, columns.length));
-					station = TextStreamUtil.buildStation(list);
-					network.addStation(station);
-					lineRead = null;
-					return station;
-				} else {
-					if (station == null) {
-						station = new Station();
-						station.setCode(columns[1]);
-						network.addStation(station);
-						List<String> list = Arrays.asList(Arrays.copyOfRange(columns, 2, columns.length));
-						station.addChannel(TextStreamUtil.buildChannel(list));
-						this.lineRead = null;
-					} else {
-						if (!station.getCode().equals(columns[1])) {
-							 Station temp = station;
-							 station=null;
-							// station = new Station();
-							// station.setCode(columns[1]);
-							// network.addStation(station);
-							// List<String> list =
-							// Arrays.asList(Arrays.copyOfRange(columns, 2,
-							// columns.length));
-							// station.addChannel(TextStreamUtil.buildChannel(list));
-							return temp;
-						}else{
-							this.lineRead=null;
-						}
-						List<String> list = Arrays.asList(Arrays.copyOfRange(columns, 2, columns.length));
-						station.addChannel(TextStreamUtil.buildChannel(list));
-					}
-				}
+			String[] columns = line.split("\\|");
+			if (columns.length < 3) {
+				throw new IOException("Invalid format: [" + line + "]");
 			}
+
+			network = new Network();
+			network.setCode(columns[0]);
+			network.setDescription(columns[1]);
+
+			try {
+				Date start = TextStreamUtil.toDate(columns[2]);
+				network.setStartDate(start);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				String text = columns[3];
+				if (text != null && !text.trim().isEmpty()) {
+					Date end = TextStreamUtil.toDate(columns[3]);
+					network.setEndDate(end);
+				}
+
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			if (columns.length > 4) {
+				String text = columns[4];
+				network.setTotalNumberStations(new BigInteger(text));
+			}
+
+			this.lineRead = null;
+			return network;
 		} catch (IOException e) {
-			System.err.println("StationTextIteratorParser: Unable to iterate lines, printing stack trace");
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return station;
+		return null;
 	}
 
 	// @Override

@@ -1,7 +1,6 @@
 package edu.iris.dmc.service;
 
 import java.io.IOException;
-import java.util.ResourceBundle;
 
 /**
  * A utility class to acquire services
@@ -12,17 +11,17 @@ import java.util.ResourceBundle;
 public class ServiceUtil {
 	private static String STATION_SERVICE_DEFAULT_URL = "http://service.iris.edu/fdsnws/station/1/";
 
-	private static String EVENT_SERVICE_DEFAULT_URL = "http:// service.iris.edu/fdsnws/event/1/";
-	private static String DATASELECT_SERVICE_DEFAULT_URL = "http:// service.iris.edu/fdsnws/dataselect/1/";
-	private static String SACPZ_SERVICE_DEFAULT_URL = "http:// service.iris.edu/irisws/sacpz/1/";
-	private static String RESP_SERVICE_DEFAULT_URL = "http:// service.iris.edu/irisws/resp/1/";
+	private static String EVENT_SERVICE_DEFAULT_URL = "http://service.iris.edu/fdsnws/event/1/";
+	private static String DATASELECT_SERVICE_DEFAULT_URL = "http://service.iris.edu/fdsnws/dataselect/1/";
+	private static String SACPZ_SERVICE_DEFAULT_URL = "http://service.iris.edu/irisws/sacpz/1/";
+	private static String RESP_SERVICE_DEFAULT_URL = "http://service.iris.edu/irisws/resp/1/";
 	private static String STATION_VERSION = "1.1";
 	private static String RESP_VERSION = "1.5.1";
 	private static String EVENT_VERSION = "1.0";
 	private static String SACPZ_VERSION = "1.1.1";
 	private static String BULKDATASELECT_VERSION = "1.0";
 	private static String DEFAULT_USER_AGENT = "IRIS-WS-Library";
-	private static String VERSION = "2.0.15";
+	private static String VERSION = "2.0.17";
 
 	private static ServiceUtil instance;
 	private StationService stationService;
@@ -87,17 +86,7 @@ public class ServiceUtil {
 			stationService.setAppName(this.appName);
 			stationService.setBaseUrl(url);
 		}
-		try {
-			stationService.validateVersion();
-			return stationService;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ServiceNotSupportedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
+		return stationService;
 	}
 
 	/**
@@ -217,17 +206,7 @@ public class ServiceUtil {
 		if (url != null) {
 			waveformService.setBaseUrl(url);
 		}
-		try {
-			waveformService.validateVersion();
-			return waveformService;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ServiceNotSupportedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
+		return waveformService;
 	}
 
 	public static ServiceUtil getInstance() {

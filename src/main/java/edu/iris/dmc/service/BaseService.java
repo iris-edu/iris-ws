@@ -12,21 +12,18 @@ import java.io.OutputStream;
 import java.net.Authenticator;
 import java.net.CookieHandler;
 import java.net.CookieManager;
-import java.net.CookiePolicy;
 import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
-import sun.net.www.protocol.http.Handler;
 import edu.iris.dmc.criteria.Criteria;
 import edu.iris.dmc.criteria.CriteriaException;
 import edu.iris.dmc.ws.util.StringUtil;
+import sun.net.www.protocol.http.Handler;
 
 public class BaseService {
 
@@ -53,85 +50,7 @@ public class BaseService {
 
 	}
 
-	protected void validateVersion() throws IOException,
-			ServiceNotSupportedException {
-		validateVersion(this.baseUrl);
-	}
 
-	protected void validateVersion(String url) throws IOException,
-			ServiceNotSupportedException {
-		doVersionCheck(url);
-	}
-
-	private void doVersionCheck(String validFdsnUrl) throws IOException,
-			ServiceNotSupportedException {
-		if (logger.isLoggable(Level.FINER)) {
-			logger.entering(this.getClass().getName(),
-					"doVersionCheck(String validFdsnUrl)",
-					new Object[] { validFdsnUrl });
-		}
-
-		URL url = new URL(validFdsnUrl);
-		String path = url.getPath();
-		if (!path.endsWith("version")) {
-			if (path.endsWith("query")) {
-				path = path.replace("query", "version");
-			} else {
-				path = path + "version";
-			}
-		}
-		URI versionURL = null;
-		try {
-			versionURL = StringUtil.createURI(url.getProtocol(), url.getHost(),
-					url.getPort(), path, null, null);
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-			throw new IOException(e.getMessage());
-		}
-
-		Handler handler = new sun.net.www.protocol.http.Handler();
-		URL theUrl = new URL(versionURL.toURL(), versionURL.toString(), handler);
-
-		if (logger.isLoggable(Level.FINER)) {
-			logger.log(Level.FINER, "URL to validate: " + theUrl.toString());
-		}
-
-		HttpURLConnection connection = null;
-		try {
-			connection = (HttpURLConnection) theUrl.openConnection();
-			String uAgent = this.userAgent;
-			if (this.appName != null && !"".equals(this.appName)) {
-				uAgent = uAgent + " (" + this.appName + ")";
-			}
-			connection.setRequestProperty("User-Agent", uAgent);
-
-			connection.setRequestMethod("GET");
-			connection.setRequestProperty("Accept", "text/plain");
-			connection.connect();
-			int responseCode = connection.getResponseCode();
-			InputStream inputStream = responseCode != HTTP_OK ? connection
-					.getErrorStream() : connection.getInputStream();
-
-			if (responseCode != 200) {
-				throw new IOException(connection.getResponseMessage());
-			}
-
-			String versionText = StringUtil.toString(inputStream);
-
-			String[] vComponents = versionText.split("\\.");
-
-			String[] lvComponents = this.serviceVersion.split("\\.");
-
-			if (!vComponents[0].equals(lvComponents[0])) {
-				throw new ServiceNotSupportedException(
-						"Version is not supported.");
-			}
-		} finally {
-			if (connection != null) {
-				connection.disconnect();
-			}
-		}
-	}
 
 	private HttpURLConnection createConnection(URL url, final String username,
 			final String password) throws IOException {
@@ -153,8 +72,8 @@ public class BaseService {
 		// make sure cookies is turned on
 		CookieHandler.setDefault(new CookieManager());
 		if (username != null || password != null) {
-			sun.net.www.protocol.http.AuthCacheValue
-					.setAuthCache(new sun.net.www.protocol.http.AuthCacheImpl());
+//			sun.net.www.protocol.http.AuthCacheValue
+//					.setAuthCache(new sun.net.www.protocol.http.AuthCacheImpl());
 			Authenticator.setDefault(new Authenticator() {
 				private int attempts = 0;
 
@@ -173,9 +92,9 @@ public class BaseService {
 		// CookieHandler.setDefault( new CookieManager( null,
 		// CookiePolicy.ACCEPT_ALL ) );
 		HttpURLConnection connection = null;
-		Handler handler = new sun.net.www.protocol.http.Handler();
-		url = new URL(url, url.toString(), handler);
-
+		//Handler handler = new sun.net.www.protocol.http.Handler();
+		//url = new URL(url, url.toString(), handler);
+		url = new URL(url, url.toString());
 		connection = (HttpURLConnection) url.openConnection();
 		connection.setUseCaches(false);
 

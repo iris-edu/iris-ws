@@ -94,17 +94,7 @@ public class WaveformService extends BaseService {
 			// connection.setConnectTimeout(10000);
 			connection.connect();
 
-			/*
-			 * URL url = null; if (this.authenticate) { url = new URL(baseUrl +
-			 * "queryauth"); } else { url = new URL(baseUrl + "query"); }
-			 * connection = getConnection(url);
-			 * connection.setRequestProperty("Content-Type",
-			 * "application/x-www-form-urlencoded");
-			 * connection.setRequestMethod("POST");
-			 * connection.setDoOutput(true); connection.setDoInput(true);
-			 * connection.setUseCaches(false);
-			 * connection.setAllowUserInteraction(false); connection.connect();
-			 */
+
 
 			OutputStream outputStream = connection.getOutputStream();
 			OutputStreamWriter writer = new OutputStreamWriter(outputStream);
@@ -252,6 +242,7 @@ public class WaveformService extends BaseService {
 						collection.addAll(result);
 					}
 				} catch (Exception e) {
+					e.printStackTrace();
 					if (e instanceof NoDataFoundException) {
 						// do nothing for now
 						if (logger.isLoggable(Level.WARNING)) {

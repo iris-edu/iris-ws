@@ -377,6 +377,7 @@ public class SacpzService extends BaseService {
 					}
 
 					if (!line.startsWith("ZEROS")) {
+						br.close();
 						throw new DataFormatException(
 								"Unable to parse data: Zeros are not found where expected");
 					}
@@ -396,12 +397,14 @@ public class SacpzService extends BaseService {
 						}
 						sacpz.setZeros(zeros);
 					} catch (NumberFormatException e) {
+						br.close();
 						throw new DataFormatException(
 								"Unable to parse data: NumberFormatException");
 					}
 
 					line = br.readLine();
 					if (line == null || !line.startsWith("POLES")) {
+						br.close();
 						throw new DataFormatException(
 								"Unable to parse data: Poles are not found where expected");
 					}
@@ -423,25 +426,23 @@ public class SacpzService extends BaseService {
 						}
 						sacpz.setPoles(poles);
 					} catch (NumberFormatException e) {
+						br.close();
 						throw new DataFormatException(
 								"Unable to parse data: NumberFormatException");
 					}
 
 					line = br.readLine();
-					if (line == null || !line.startsWith("CONSTANT")) {
-						throw new DataFormatException(
-								"Unable to parse data: Constant not found where expected");
+					if(line!=null && line.startsWith("CONSTANT")){
+						line = line.trim();
+
+						components = line.split("\t");
+						try {
+							Double constant = Double.parseDouble(components[1]);
+							sacpz.setConstant(constant);
+						} catch (NumberFormatException e) {
+
+						}
 					}
-					line = line.trim();
-
-					components = line.split("\t");
-					try {
-						Double constant = Double.parseDouble(components[1]);
-						sacpz.setConstant(constant);
-					} catch (NumberFormatException e) {
-
-					}
-
 					list.add(sacpz);
 				}
 
