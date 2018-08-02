@@ -2,10 +2,8 @@ package edu.iris.dmc.timeseries.model;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.TimeZone;
 import java.util.logging.Level;
@@ -20,7 +18,6 @@ import edu.iris.dmc.timeseries.model.Segment.Type;
 import edu.sc.seis.seisFile.mseed.Blockette;
 import edu.sc.seis.seisFile.mseed.Blockette100;
 import edu.sc.seis.seisFile.mseed.Blockette1000;
-import edu.sc.seis.seisFile.mseed.Btime;
 import edu.sc.seis.seisFile.mseed.DataRecord;
 import edu.sc.seis.seisFile.mseed.SeedFormatException;
 
@@ -64,6 +61,10 @@ public class Timeseries implements Serializable {
 		if (record == null || record.getData() == null) {
 			return;
 		}
+		int numberOfSamples = record.getHeader().getNumSamples();
+		if(numberOfSamples<1){
+			return;
+		}
 		int format = -1;
 
 		Blockette1000 b1000 = (Blockette1000) record.getUniqueBlockette(1000);
@@ -73,7 +74,7 @@ public class Timeseries implements Serializable {
 
 		Codec codec = new Codec();
 		float sampleRate = record.getHeader().getSampleRate();
-		int numberOfSamples = record.getHeader().getNumSamples();
+		
 		Blockette[] bs = record.getBlockettes(100);
 		if (bs != null && bs.length > 0) {
 			Blockette100 b100 = (Blockette100) bs[0];

@@ -8,6 +8,8 @@ public class TraceDataTest {
 
 	@Test
 	public void fetch() throws Exception {
-		Trace[] traces=TraceData.fetchTraces("IU", "ANMO", "00", "BHZ", "2010-01-01 00:00:00.000", "2010-01-01 02:00:00.000", 'B', true);
+		//IU&sta=ANMO&loc=00&cha=LHZ&start=2004-12-26T00:00:00&end=2004-12-27T00:00:00&nodata=404
+		TraceData.setBASE_URL("http://service.iris.edu");
+		Trace[] traces=TraceData.fetchTraces("IU", "ANMO", "00", "LHZ", "2004-12-26 00:00:00.000", "2004-12-27 00:00:00.000", 'B', true);
 	}
 }
