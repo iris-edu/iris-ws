@@ -14,7 +14,6 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 import edu.iris.dmc.criteria.CriteriaException;
 import edu.iris.dmc.criteria.OutputLevel;
