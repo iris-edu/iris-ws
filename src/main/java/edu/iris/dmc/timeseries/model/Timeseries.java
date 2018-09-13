@@ -65,6 +65,7 @@ public class Timeseries implements Serializable {
 		if(numberOfSamples<1){
 			return;
 		}
+		
 		int format = -1;
 
 		Blockette1000 b1000 = (Blockette1000) record.getUniqueBlockette(1000);

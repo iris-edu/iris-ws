@@ -13,12 +13,19 @@ import java.net.Authenticator;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 
 import edu.iris.dmc.criteria.Criteria;
 import edu.iris.dmc.criteria.CriteriaException;
@@ -27,8 +34,7 @@ import sun.net.www.protocol.http.Handler;
 
 public class BaseService {
 
-	private Logger logger = Logger
-			.getLogger("edu.iris.dmc.service.BaseService");
+	private Logger logger = Logger.getLogger("edu.iris.dmc.service.BaseService");
 
 	public static int DEFAULT_READ_TIMEOUT_IN_MS = 180000;
 
@@ -51,81 +57,71 @@ public class BaseService {
 	}
 
 
+	protected HttpURLConnection getConnection(String url, String username, String password)
+			throws IOException, ServiceNotSupportedException {
+		if (username != null || password != null) {
+			url = url.replace("query", "queryauth");
+		}
 
-	private HttpURLConnection createConnection(URL url, final String username,
-			final String password) throws IOException {
-		/*
-		 * String host = url.getHost(); int port = url.getPort(); String path =
-		 * url.getPath(); if (!this.authenticate && path != null &&
-		 * path.contains("query")) { path = path.replace("query", ""); } else {
-		 * path = path.replace("queryauth", ""); } String baseUrl = "http://" +
-		 * host;
-		 * 
-		 * if (port > -1 && port != 80) { baseUrl = baseUrl + ":" + port; }
-		 * baseUrl = baseUrl + path;
-		 */
 		String uAgent = this.userAgent;
 		if (this.appName != null && !"".equals(this.appName)) {
 			uAgent = uAgent + " (" + this.appName + ")";
 		}
 
-		// make sure cookies is turned on
-		CookieHandler.setDefault(new CookieManager());
-		if (username != null || password != null) {
-//			sun.net.www.protocol.http.AuthCacheValue
-//					.setAuthCache(new sun.net.www.protocol.http.AuthCacheImpl());
-			Authenticator.setDefault(new Authenticator() {
-				private int attempts = 0;
-
-				@Override
-				protected PasswordAuthentication getPasswordAuthentication() {
-					if (attempts > 1) {
-						return null;
-					}
-					attempts++;
-					return new PasswordAuthentication(username, password
-							.toCharArray());
-				}
-			});
+		if (url.startsWith("https")) {
+			return buildSSLConn(url, uAgent, username, password);
+		} else {
+			return buildConn(url, uAgent, username, password);
 		}
-
-		// CookieHandler.setDefault( new CookieManager( null,
-		// CookiePolicy.ACCEPT_ALL ) );
-		HttpURLConnection connection = null;
-		//Handler handler = new sun.net.www.protocol.http.Handler();
-		//url = new URL(url, url.toString(), handler);
-		url = new URL(url, url.toString());
-		connection = (HttpURLConnection) url.openConnection();
-		connection.setUseCaches(false);
-
-		connection.setRequestProperty("User-Agent", uAgent);
-		connection.setReadTimeout(DEFAULT_READ_TIMEOUT_IN_MS);
-		return connection;
 	}
 
-	protected HttpURLConnection getConnection(String url, String username,
-			String password) throws IOException, ServiceNotSupportedException {
-		if (username != null || password != null) {
-			url = url.replace("query", "queryauth");
+	protected HttpURLConnection getConnection(String url) throws IOException, ServiceNotSupportedException {
+		return getConnection(url,null,null);
+	}
+
+	private HttpURLConnection buildSSLConn(String url, String uAgent, String username, String password)
+			throws IOException {
+
+		try {
+			SSLContext sc = SSLContext.getInstance("SSL");
+			sc.init(null, new TrustManager[] { new TrustAnyTrustManager() }, new java.security.SecureRandom());
+
+			URL console = new URL(url);
+			HttpsURLConnection conn = (HttpsURLConnection) console.openConnection();
+			conn.setSSLSocketFactory(sc.getSocketFactory());
+			conn.setHostnameVerifier(new TrustAnyHostnameVerifier());
+
+			conn.setUseCaches(false);
+
+			conn.setRequestProperty("User-Agent", uAgent);
+			conn.setReadTimeout(DEFAULT_READ_TIMEOUT_IN_MS);
+
+			return conn;
+		} catch (KeyManagementException e) {
+			throw new IOException(e);
+		} catch (MalformedURLException e) {
+			throw new IOException(e);
+		} catch (NoSuchAlgorithmException e) {
+			throw new IOException(e);
 		}
-		URL u = new URL(url);
-		return createConnection(u, username, password);
 	}
 
-	protected HttpURLConnection getConnection(String url) throws IOException,
-			ServiceNotSupportedException {
-		URL u = new URL(url);
-		return createConnection(u, null, null);
-	}
+	private HttpURLConnection buildConn(String url, String uAgent, String username, String password)
+			throws IOException {
+		HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+		conn.setUseCaches(false);
 
+		conn.setRequestProperty("User-Agent", uAgent);
+		conn.setReadTimeout(DEFAULT_READ_TIMEOUT_IN_MS);
+		return conn;
+	}
 	/*
 	 * protected void authenticate(boolean authenticate) { this.authenticate =
 	 * authenticate; }
 	 */
 
 	/**
-	 * Stream result into output stream, can be used to save result to a local
-	 * file.
+	 * Stream result into output stream, can be used to save result to a local file.
 	 * 
 	 * @param out
 	 * @param criteria
@@ -137,13 +133,11 @@ public class BaseService {
 	 * @throws ServiceNotSupportedException
 	 * @throws UnauthorizedAccessException
 	 */
-	public void stream(OutputStream out, Criteria criteria)
-			throws NoDataFoundException, CriteriaException, IOException,
+	public void stream(OutputStream out, Criteria criteria) throws NoDataFoundException, CriteriaException, IOException,
 			ServiceNotSupportedException, UnauthorizedAccessException {
 
 		if (logger.isLoggable(Level.FINER)) {
-			logger.entering(this.getClass().getName(),
-					"find(OutputStream out, Criteria criteria)",
+			logger.entering(this.getClass().getName(), "find(OutputStream out, Criteria criteria)",
 					new Object[] { criteria });
 		}
 
@@ -170,8 +164,7 @@ public class BaseService {
 			connection.connect();
 
 			int responseCode = connection.getResponseCode();
-			inputStream = responseCode != HTTP_OK ? connection.getErrorStream()
-					: connection.getInputStream();
+			inputStream = responseCode != HTTP_OK ? connection.getErrorStream() : connection.getInputStream();
 			if ("gzip".equals(connection.getContentEncoding())) {
 				inputStream = new GZIPInputStream(inputStream);
 			}
@@ -179,24 +172,21 @@ public class BaseService {
 			switch (responseCode) {
 			case 404:
 				if (logger.isLoggable(WARNING))
-					logger.warning("No data Found for the GET request "
-							+ theQuery + StringUtil.toString(inputStream));
+					logger.warning("No data Found for the GET request " + theQuery + StringUtil.toString(inputStream));
 				return;
 			case 204:
 				if (logger.isLoggable(WARNING))
-					logger.warning("No data Found for the GET request "
-							+ theQuery);
+					logger.warning("No data Found for the GET request " + theQuery);
 				throw new NoDataFoundException("No data found for: " + theQuery);
 			case 400:
 				if (logger.isLoggable(SEVERE))
-					logger.severe("An error occurred while making a GET request "
-							+ theQuery + StringUtil.toString(inputStream));
-				throw new CriteriaException("Bad request parameter: "
-						+ StringUtil.toString(inputStream));
+					logger.severe("An error occurred while making a GET request " + theQuery
+							+ StringUtil.toString(inputStream));
+				throw new CriteriaException("Bad request parameter: " + StringUtil.toString(inputStream));
 			case 500:
 				if (logger.isLoggable(WARNING))
-					logger.severe("An error occurred while making a GET request "
-							+ theQuery + StringUtil.toString(inputStream));
+					logger.severe("An error occurred while making a GET request " + theQuery
+							+ StringUtil.toString(inputStream));
 				throw new IOException(StringUtil.toString(inputStream));
 			case 200:
 				BufferedInputStream data = new BufferedInputStream(inputStream);
@@ -217,8 +207,7 @@ public class BaseService {
 
 				if (logger.isLoggable(Level.FINER)) {
 					// Use the following if the method does not return a value
-					logger.exiting(this.getClass().getName(),
-							"find(OutputStream out, Criteria criteria)");
+					logger.exiting(this.getClass().getName(), "find(OutputStream out, Criteria criteria)");
 				}
 				break;
 			default:
@@ -249,8 +238,8 @@ public class BaseService {
 	}
 
 	/**
-	 * Provide an appName included in the User-Agent. This text string is
-	 * intended to uniquely identify an application. Preferred string format:
+	 * Provide an appName included in the User-Agent. This text string is intended
+	 * to uniquely identify an application. Preferred string format:
 	 * "APPNAME/VERSION"
 	 * 
 	 * @param appName
