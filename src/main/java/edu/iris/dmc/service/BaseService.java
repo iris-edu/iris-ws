@@ -56,12 +56,12 @@ public class BaseService {
 
 	}
 
+	protected HttpURLConnection getConnection(String url) throws IOException, ServiceNotSupportedException {
+		return getConnection(url, null, null);
+	}
 
 	protected HttpURLConnection getConnection(String url, String username, String password)
 			throws IOException, ServiceNotSupportedException {
-		if (username != null || password != null) {
-			url = url.replace("query", "queryauth");
-		}
 
 		String uAgent = this.userAgent;
 		if (this.appName != null && !"".equals(this.appName)) {
@@ -75,17 +75,29 @@ public class BaseService {
 		}
 	}
 
-	protected HttpURLConnection getConnection(String url) throws IOException, ServiceNotSupportedException {
-		return getConnection(url,null,null);
-	}
-
-	private HttpURLConnection buildSSLConn(String url, String uAgent, String username, String password)
+	private HttpURLConnection buildSSLConn(String url, String uAgent, final String username, final String password)
 			throws IOException {
 
 		try {
 			SSLContext sc = SSLContext.getInstance("SSL");
 			sc.init(null, new TrustManager[] { new TrustAnyTrustManager() }, new java.security.SecureRandom());
 
+			if (username != null || password != null) {
+				url = url.replace("query", "queryauth");
+
+				Authenticator.setDefault(new Authenticator() {
+					private int attempts = 0;
+
+					@Override
+					protected PasswordAuthentication getPasswordAuthentication() {
+						if (attempts > 1) {
+							return null;
+						}
+						attempts++;
+						return new PasswordAuthentication(username, password.toCharArray());
+					}
+				});
+			}
 			URL console = new URL(url);
 			HttpsURLConnection conn = (HttpsURLConnection) console.openConnection();
 			conn.setSSLSocketFactory(sc.getSocketFactory());
@@ -106,8 +118,25 @@ public class BaseService {
 		}
 	}
 
-	private HttpURLConnection buildConn(String url, String uAgent, String username, String password)
+	private HttpURLConnection buildConn(String url, String uAgent, final String username, final String password)
 			throws IOException {
+
+		if (username != null || password != null) {
+			url = url.replace("query", "queryauth");
+
+			Authenticator.setDefault(new Authenticator() {
+				private int attempts = 0;
+
+				@Override
+				protected PasswordAuthentication getPasswordAuthentication() {
+					if (attempts > 1) {
+						return null;
+					}
+					attempts++;
+					return new PasswordAuthentication(username, password.toCharArray());
+				}
+			});
+		}
 		HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
 		conn.setUseCaches(false);
 
