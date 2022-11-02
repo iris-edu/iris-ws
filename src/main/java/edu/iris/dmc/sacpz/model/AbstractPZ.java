@@ -1,7 +1,6 @@
 package edu.iris.dmc.sacpz.model;
 
 public class AbstractPZ implements PZ {
-
 	protected Double real;
 	protected Double imaginary;
 
@@ -11,11 +10,11 @@ public class AbstractPZ implements PZ {
 	}
 
 	public Double getReal() {
-		return real;
+		return this.real;
 	}
 
 	public Double getImaginary() {
-		return imaginary;
+		return this.imaginary;
 	}
 
 	public void setReal(Double real) {
@@ -25,5 +24,4 @@ public class AbstractPZ implements PZ {
 	public void setImaginary(Double imaginary) {
 		this.imaginary = imaginary;
 	}
-
 }

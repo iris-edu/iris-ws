@@ -1,13 +1,11 @@
 package edu.iris.dmc.service;
 
-import java.util.List;
-
-import org.junit.Test;
-
 import edu.iris.dmc.criteria.SacpzCriteria;
 import edu.iris.dmc.sacpz.model.Sacpz;
 import edu.iris.dmc.ws.util.DateUtil;
-import edu.iris.dmc.ws.util.RespUtil;
+import org.junit.Test;
+
+import java.util.List;
 
 public class SacpzServiceTest {
 

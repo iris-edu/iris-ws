@@ -1,10 +1,14 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
+
 package edu.iris.dmc.sacpz.model;
 
 import java.util.Date;
 import java.util.List;
 
 public class Sacpz {
-
 	private String network;
 	private String station;
 	private String channel;
@@ -27,168 +31,210 @@ public class Sacpz {
 	private String comment;
 	private NumberUnit sensitivity;
 	private Double a0;
-	
 	private double constant;
 	private List<Pole> poles;
 	private List<Zero> zeros;
-	
-	
-	
-	public String getNetwork() {
-		return network;
+
+	public Sacpz() {
 	}
+
+	public String getNetwork() {
+		return this.network;
+	}
+
 	public void setNetwork(String network) {
 		this.network = network;
 	}
+
 	public String getStation() {
-		return station;
+		return this.station;
 	}
+
 	public void setStation(String station) {
 		this.station = station;
 	}
+
 	public String getChannel() {
-		return channel;
+		return this.channel;
 	}
+
 	public void setChannel(String channel) {
 		this.channel = channel;
 	}
+
 	public String getLocation() {
-		return location;
+		return this.location;
 	}
+
 	public void setLocation(String location) {
 		this.location = location;
 	}
-	
-	
+
 	public Date getCreated() {
-		return created;
+		return this.created;
 	}
+
 	public void setCreated(Date created) {
 		this.created = created;
 	}
+
 	public Date getStartTime() {
-		return startTime;
+		return this.startTime;
 	}
+
 	public void setStartTime(Date startTime) {
 		this.startTime = startTime;
 	}
+
 	public Date getEndTime() {
-		return endTime;
+		return this.endTime;
 	}
+
 	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
 	}
+
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
+
 	public void setDescription(String description) {
 		this.description = description;
 	}
+
 	public Double getLatitude() {
-		return latitude;
+		return this.latitude;
 	}
+
 	public void setLatitude(Double latitude) {
 		this.latitude = latitude;
 	}
+
 	public double getLongitude() {
-		return longitude;
+		return this.longitude;
 	}
+
 	public void setLongitude(double longitude) {
 		this.longitude = longitude;
 	}
+
 	public Double getElevation() {
-		return elevation;
+		return this.elevation;
 	}
+
 	public void setElevation(Double elevation) {
 		this.elevation = elevation;
 	}
+
 	public Double getDepth() {
-		return depth;
+		return this.depth;
 	}
+
 	public void setDepth(Double depth) {
 		this.depth = depth;
 	}
-	
-	
+
 	public Double getInclination() {
-		return dip;
+		return this.dip;
 	}
+
 	public void setInclination(Double dip) {
 		this.dip = dip;
 	}
+
 	public Double getAzimuth() {
-		return azimuth;
+		return this.azimuth;
 	}
+
 	public void setAzimuth(Double azimuth) {
 		this.azimuth = azimuth;
 	}
+
 	public Double getSampleRate() {
-		return sampleRate;
+		return this.sampleRate;
 	}
+
 	public void setSampleRate(Double sampleRate) {
 		this.sampleRate = sampleRate;
 	}
+
 	public String getInputUnit() {
-		return inputUnit;
+		return this.inputUnit;
 	}
+
 	public void setInputUnit(String inputUnit) {
 		this.inputUnit = inputUnit;
 	}
+
 	public String getOutputUnit() {
-		return outputUnit;
+		return this.outputUnit;
 	}
+
 	public void setOutputUnit(String outputUnit) {
 		this.outputUnit = outputUnit;
 	}
+
 	public String getInstrumentType() {
-		return instrumentType;
+		return this.instrumentType;
 	}
+
 	public void setInstrumentType(String instrumentType) {
 		this.instrumentType = instrumentType;
 	}
+
 	public NumberUnit getInstrumentGain() {
-		return instrumentGain;
+		return this.instrumentGain;
 	}
+
 	public void setInstrumentGain(NumberUnit instrumentGain) {
 		this.instrumentGain = instrumentGain;
 	}
+
 	public String getComment() {
-		return comment;
+		return this.comment;
 	}
+
 	public void setComment(String comment) {
 		this.comment = comment;
 	}
+
 	public NumberUnit getSensitivity() {
-		return sensitivity;
+		return this.sensitivity;
 	}
+
 	public void setSensitivity(NumberUnit sensitivity) {
 		this.sensitivity = sensitivity;
 	}
+
 	public Double getA0() {
-		return a0;
+		return this.a0;
 	}
+
 	public void setA0(Double a0) {
 		this.a0 = a0;
 	}
+
 	public double getConstant() {
-		return constant;
+		return this.constant;
 	}
+
 	public void setConstant(double constant) {
 		this.constant = constant;
 	}
+
 	public List<Pole> getPoles() {
-		return poles;
+		return this.poles;
 	}
+
 	public void setPoles(List<Pole> poles) {
 		this.poles = poles;
 	}
+
 	public List<Zero> getZeros() {
-		return zeros;
+		return this.zeros;
 	}
+
 	public void setZeros(List<Zero> zeros) {
 		this.zeros = zeros;
 	}
-	
-	
-	
 }

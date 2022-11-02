@@ -1,12 +1,11 @@
 package edu.iris.dmc.event.model;
 
-import java.util.Date;
+import edu.iris.quake.model.TimeQuantity;
+import edu.iris.quake.model.WaveformStreamID;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.XMLGregorianCalendar;
-
-import edu.iris.quake.model.TimeQuantity;
-import edu.iris.quake.model.WaveformStreamID;
+import java.util.Date;
 
 public class Pick {
 

@@ -4,7 +4,7 @@ import edu.iris.dmc.timeseries.model.Segment;
 import edu.iris.dmc.timeseries.model.Timeseries;
 
 public final class WsToStringUtils {
-	
+
 	public static String timeSeriesToString(Timeseries ts) {
 		if (ts == null) return "";
 		StringBuilder sb = new StringBuilder();
@@ -18,20 +18,20 @@ public final class WsToStringUtils {
 		for (Segment s: ts.getSegments()) {
 			sb.append(segmentToString(s));
 		}
-		
-		 return sb.toString();
+
+		return sb.toString();
 	}
-	
+
 	public static String segmentToString(Segment s) {
 		if (s == null) return "";
 		StringBuilder sb = new StringBuilder();
 		sb.append(" SEGMENT: ");
-		sb.append("  Type:         " + s.getType());
-		sb.append("  Sample Rate:  " + s.getSamplerate());
-		sb.append("  Count:        " + s.getSampleCount());
-		sb.append("  Start Time:   " + s.getStartTime());
+		sb.append("  Type:         ").append(s.getType());
+		sb.append("  Sample Rate:  ").append(s.getSamplerate());
+		sb.append("  Count:        ").append(s.getSampleCount());
+		sb.append("  Start Time:   ").append(s.getStartTime());
 		sb.append("  StartTime ns: " + s.getStartTime().getNanos());
-		sb.append("  End Time:     " + s.getEndTime());
+		sb.append("  End Time:     ").append(s.getEndTime());
 		sb.append("  End Time ns: " + s.getEndTime().getNanos() +  "\n");
 		return sb.toString();
 	}

@@ -1,3 +1,8 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
+
 package edu.iris.dmc.ws.util;
 
 import java.text.ParseException;
@@ -6,44 +11,74 @@ import java.util.Date;
 import java.util.TimeZone;
 
 public class DateUtil {
+	private static final String SHORT_DATE = "yyyy-MM-dd";
+	private static String[] patterns = new String[]{"yyyy-MM-dd", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd' 'HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss.SSS", "yyyy-MM-dd' 'HH:mm:ss.SSS", "yyyy,DDD,HH:mm:ss", "yyyy,DDD,HH:mm:ss"};
 
-	private static String SHORTDATE = "yyyy-MM-dd";
-	private static String LONGDATE = "yyyy-MM-dd'T'HH:mm:ss";
-	//public static SimpleDateFormat SHORTDF = new SimpleDateFormat(SHORTDATE);
-	//public static SimpleDateFormat LONGDF = new SimpleDateFormat(LONGDATE);
-	
-	public static Date parse(String string) throws ParseException{
-		if(string == null){
-			return null;
-		}
-		
-		SimpleDateFormat sdf =  new SimpleDateFormat(SHORTDATE);
-		if(string.length()>SHORTDATE.length()){
-			sdf = new SimpleDateFormat(LONGDATE);
-		}
-		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-		Date date = sdf.parse(string);
-		return date;
+	public DateUtil() {
 	}
-	
-	public static Date parse(String string, String pattern) throws ParseException{
-		if(string == null){
+
+	public static Date parseAny(String dateString) throws ParseException {
+		if (dateString != null && !dateString.trim().isEmpty()) {
+			String[] var1 = patterns;
+			int var2 = var1.length;
+
+			for(int var3 = 0; var3 < var2; ++var3) {
+				String pattern = var1[var3];
+
+				try {
+					if (dateString.length() <= pattern.length()) {
+						SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+						simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+						return simpleDateFormat.parse(dateString);
+					}
+				} catch (ParseException var6) {
+				}
+			}
+
+			throw new ParseException("Unable to parse the date: " + dateString, -1);
+		} else {
 			return null;
 		}
-		
-		SimpleDateFormat sdf =  new SimpleDateFormat(pattern);
-		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-		Date date = sdf.parse(string);
-		return date;
 	}
-	
-	public static String format(Date date){
-		if(date == null){
+
+	public static Date parse(String string, String pattern) throws ParseException {
+		if (string == null) {
 			return null;
+		} else {
+			SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+			sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+			return sdf.parse(string);
 		}
-		
-		SimpleDateFormat sdf = new SimpleDateFormat(LONGDATE);
-		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-		return sdf.format(date);
+	}
+
+	public static String format(Date date) {
+		if (date == null) {
+			return null;
+		} else {
+			String LONGDATE = "yyyy-MM-dd'T'HH:mm:ss";
+			return format(date, LONGDATE);
+		}
+	}
+
+	public static String format(Date date, String pattern) {
+		if (date == null) {
+			return null;
+		} else if (pattern == null) {
+			return null;
+		} else {
+			SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+			sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+			return sdf.format(date);
+		}
+	}
+
+	public static String now(String pattern) {
+		if (pattern == null) {
+			return null;
+		} else {
+			SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+			sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+			return sdf.format(System.currentTimeMillis());
+		}
 	}
 }

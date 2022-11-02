@@ -1,33 +1,22 @@
-package edu.iris.dmc.extensions.entities;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.TimeZone;
-import java.sql.Timestamp;
+package edu.iris.dmc.extensions.entities;
 
 import edu.iris.dmc.sacpz.model.Sacpz;
 import edu.iris.dmc.timeseries.model.Segment;
 import edu.iris.dmc.timeseries.model.Segment.Type;
-import edu.sc.seis.seisFile.sac.SacHeader;
-import edu.sc.seis.seisFile.sac.SacTimeSeries;
 
-/**
- * This class handles waveform data and meta data in (currently) a very SAC
- * oriented way. It also contains methods for creating an IRIS standard SAC file
- * name and a SeisFile SAC object.
- * 
- */
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+
 public class Trace {
-
 	private String network;
 	private String station;
 	private String location;
 	private String channel;
 	private Character quality;
-
 	private double latitude;
 	private double longitude;
 	private double elevation;
@@ -35,183 +24,171 @@ public class Trace {
 	private double azimuth;
 	private double dip;
 	private String instrument;
-
 	private double sensitivity;
 	private double sensitivityFrequency;
 	private String sensitivityUnits;
-
 	private Timestamp startTime;
 	private Timestamp endTime;
-
 	private double sampleRate;
 	private int sampleCount;
-
-	// private float[] data;
-
-	private List<Number> data = new ArrayList<Number>();
-
+	private List<Number> data = new ArrayList<>();
 	private Type dataType;
-
 	private Sacpz sacpz;
 
-	// ACCESSORS
-
 	public String getNetwork() {
-		return network;
+		return this.network;
 	}
 
 	public void setNetwork(String s) {
-		network = s;
+		this.network = s;
 	}
 
 	public String getStation() {
-		return station;
+		return this.station;
 	}
 
 	public void setStation(String s) {
-		station = s;
+		this.station = s;
 	}
 
 	public String getLocation() {
-		return location;
+		return this.location;
 	}
 
 	public void setLocation(String s) {
-		location = s;
+		this.location = s;
 	}
 
 	public String getChannel() {
-		return channel;
+		return this.channel;
 	}
 
 	public void setChannel(String s) {
-		channel = s;
+		this.channel = s;
 	}
 
 	public Character getQuality() {
-		return quality;
+		return this.quality;
 	}
 
 	public void setQuality(Character c) {
-		quality = c;
+		this.quality = c;
 	}
 
 	public double getLatitude() {
-		return latitude;
+		return this.latitude;
 	}
 
 	public void setLatitude(double d) {
-		latitude = d;
+		this.latitude = d;
 	}
 
 	public double getLongitude() {
-		return longitude;
+		return this.longitude;
 	}
 
 	public void setLongitude(double d) {
-		longitude = d;
+		this.longitude = d;
 	}
 
 	public double getElevation() {
-		return elevation;
+		return this.elevation;
 	}
 
 	public void setElevation(double d) {
-		elevation = d;
+		this.elevation = d;
 	}
 
 	public double getDepth() {
-		return depth;
+		return this.depth;
 	}
 
 	public void setDepth(double d) {
-		depth = d;
+		this.depth = d;
 	}
 
 	public double getAzimuth() {
-		return azimuth;
+		return this.azimuth;
 	}
 
 	public void setAzimuth(double d) {
-		azimuth = d;
+		this.azimuth = d;
 	}
 
 	public double getDip() {
-		return dip;
+		return this.dip;
 	}
 
 	public void setDip(double d) {
-		dip = d;
+		this.dip = d;
 	}
 
 	public String getInstrument() {
-		return instrument;
+		return this.instrument;
 	}
 
 	public void setInstrument(String s) {
-		instrument = s;
+		this.instrument = s;
 	}
 
 	public double getSensitivity() {
-		return sensitivity;
+		return this.sensitivity;
 	}
 
 	public void setSensitivity(double d) {
-		sensitivity = d;
+		this.sensitivity = d;
 	}
 
 	public double getSensitivityFrequency() {
-		return sensitivityFrequency;
+		return this.sensitivityFrequency;
 	}
 
 	public void setSensitivityFrequency(double d) {
-		sensitivityFrequency = d;
+		this.sensitivityFrequency = d;
 	}
 
 	public String getSensitivityUnits() {
-		return sensitivityUnits;
+		return this.sensitivityUnits;
 	}
 
 	public void SetSensitivityUnits(String s) {
-		sensitivityUnits = s;
+		this.sensitivityUnits = s;
 	}
 
 	public Timestamp getStartTime() {
-		return startTime;
+		return this.startTime;
 	}
 
 	public Timestamp getEndTime() {
-		return endTime;
+		return this.endTime;
 	}
 
 	public double getSampleRate() {
-		return sampleRate;
+		return this.sampleRate;
 	}
 
 	public void setSampleRate(double d) {
-		sampleRate = d;
+		this.sampleRate = d;
 	}
 
 	public int getSampleCount() {
-		return sampleCount;
+		return this.sampleCount;
 	}
 
 	public void setSampleCount(int i) {
-		sampleCount = i;
+		this.sampleCount = i;
 	}
 
 	public List<Number> getData() {
-		return data;
-	};
+		return this.data;
+	}
 
 	public void setData(List<Number> af) {
-		data = af;
-	};
-
-	// CONSTRUCTORS
+		this.data = af;
+	}
 
 	public Sacpz getSacpz() {
-		return sacpz;
+		return this.sacpz;
 	}
 
 	public void setSacpz(Sacpz sacpz) {
@@ -222,22 +199,15 @@ public class Trace {
 		return this.dataType;
 	}
 
-	// Base constructor
 	public Trace() {
 	}
 
-	// Create a new Trace object based off of a Metadata object, a Segment
-	// object which
-	// contains the waveform data and a quality character.
-
 	public Trace(Metadata md, Segment s, Character qual) {
 		this.quality = qual;
-
 		this.network = md.network;
 		this.station = md.station;
 		this.location = md.location;
 		this.channel = md.channel;
-
 		this.latitude = md.lat;
 		this.longitude = md.lon;
 		this.elevation = md.elev;
@@ -248,116 +218,105 @@ public class Trace {
 		this.sensitivity = md.sensitivity;
 		this.sensitivityFrequency = md.sensFreq;
 		this.sensitivityUnits = md.sensUnits;
-
 		this.startTime = s.getStartTime();
 		this.endTime = s.getEndTime();
 		this.sampleCount = s.getSampleCount();
-		this.sampleRate = s.getSamplerate();
-
-		// Convert all types to floats.
+		this.sampleRate = (double)s.getSamplerate();
 		this.dataType = s.getType();
-
-		switch (dataType) {
-
-		case DOUBLE:
-			List<Double> d = s.getDoubleData();
-			for (double i : d) {
-				this.data.add(i);
-			}
-			break;
-		case FLOAT:
-			List<Float> f = s.getFloatData();
-			for (float i : f) {
-				this.data.add(i);
-			}
-			break;
-		case INTEGER:
-			List<Integer> l = s.getIntData();
-			for (int i : l) {
-				this.data.add(i);
-			}
-			break;
-		case SHORT:
-			List<Short> sl = s.getShortData();
-			for (short i : sl) {
-				this.data.add(i);
-			}
-			break;
-		default:
-			System.err.println("Unknown data type in writeSacFile");
+		switch(this.dataType) {
+			case DOUBLE:
+				List<Double> d = s.getDoubleData();
+				this.data.addAll(d);
+				return;
+			case FLOAT:
+				List<Float> f = s.getFloatData();
+				this.data.addAll(f);
+				return;
+			case INTEGER:
+				List<Integer> l = s.getIntData();
+				this.data.addAll(l);
+				return;
+			case SHORT:
+				this.data.addAll(s.getShortData());
+				return;
+			default:
+				System.err.println("Unknown data type in writeSacFile");
 		}
-
 	}
 
 	public int[] getAsInt() {
 		int size = this.data.size();
 		if (size == 0) {
 			return null;
+		} else {
+			int[] temp = new int[size];
+
+			for(int i = 0; i < size; ++i) {
+				temp[i] = ((Number)this.data.get(i)).intValue();
+			}
+
+			return temp;
 		}
-		int[] temp = new int[size];
-		for (int i = 0; i < size; i++) {
-			temp[i] = this.data.get(i).intValue();
-		}
-		return temp;
 	}
 
 	public short[] getAsShort() {
 		int size = this.data.size();
 		if (size == 0) {
 			return null;
+		} else {
+			short[] temp = new short[size];
+
+			for(int i = 0; i < size; ++i) {
+				temp[i] = ((Number)this.data.get(i)).shortValue();
+			}
+
+			return temp;
 		}
-		short[] temp = new short[size];
-		for (int i = 0; i < size; i++) {
-			temp[i] = this.data.get(i).shortValue();
-		}
-		return temp;
 	}
 
 	public float[] getAsFloat() {
 		int size = this.data.size();
 		if (size == 0) {
 			return null;
+		} else {
+			float[] temp = new float[size];
+
+			for(int i = 0; i < size; ++i) {
+				temp[i] = ((Number)this.data.get(i)).floatValue();
+			}
+
+			return temp;
 		}
-		float[] temp = new float[size];
-		for (int i = 0; i < size; i++) {
-			temp[i] = this.data.get(i).floatValue();
-		}
-		return temp;
 	}
 
 	public double[] getAsDouble() {
 		int size = this.data.size();
 		if (size == 0) {
 			return null;
+		} else {
+			double[] temp = new double[size];
+
+			for(int i = 0; i < size; ++i) {
+				temp[i] = ((Number)this.data.get(i)).doubleValue();
+			}
+
+			return temp;
 		}
-		double[] temp = new double[size];
-		for (int i = 0; i < size; i++) {
-			temp[i] = this.data.get(i).doubleValue();
-		}
-		return temp;
 	}
 
-	// Utility function for pretty printing.
 	public String toString() {
-		final DateFormat sdfm = new SimpleDateFormat(
-				"yyyy-MM-dd'T'HH:mm:ss:SSS");
-
+		DateFormat sdfm = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss:SSS");
 		StringBuffer sb = new StringBuffer();
-
-		sb.append(network + "," + station + "," + location + "," + channel
-				+ ",");
-		sb.append(latitude + "," + longitude + "," + elevation + "," + depth
-				+ "," + azimuth + "," + dip + ",");
-
-		sb.append(instrument + "," + sensitivity + "," + sensitivityFrequency
-				+ "," + sensitivityUnits + "," + sampleRate + ",");
-		sb.append(sdfm.format(startTime) + "," + sdfm.format(endTime) + "\n");
-		if (data != null) {
-			sb.append(" " + data.size() + " samples");
+		sb.append(this.network + "," + this.station + "," + this.location + "," + this.channel + ",");
+		sb.append(this.latitude + "," + this.longitude + "," + this.elevation + "," + this.depth + "," + this.azimuth + "," + this.dip + ",");
+		sb.append(this.instrument + "," + this.sensitivity + "," + this.sensitivityFrequency + "," + this.sensitivityUnits + "," + this.sampleRate + ",");
+		sb.append(sdfm.format(this.startTime) + "," + sdfm.format(this.endTime) + "\n");
+		if (this.data != null) {
+			sb.append(" " + this.data.size() + " samples");
 		} else {
 			sb.append(" NO DATA");
 		}
+
 		return sb.toString();
 	}
-
 }

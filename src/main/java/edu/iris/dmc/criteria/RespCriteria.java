@@ -1,12 +1,12 @@
 package edu.iris.dmc.criteria;
 
+import edu.iris.dmc.ws.util.DateUtil;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
-
-import edu.iris.dmc.ws.util.DateUtil;
 
 /**
  * RespCriteria is a simple criteria builder to retrieve Resp data

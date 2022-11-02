@@ -1,13 +1,9 @@
-package edu.iris.dmc.timeseries.model;
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
 
-import java.io.Serializable;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.TimeZone;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+package edu.iris.dmc.timeseries.model;
 
 import edu.iris.dmc.fdsn.station.model.Channel;
 import edu.iris.dmc.seedcodec.Codec;
@@ -15,189 +11,124 @@ import edu.iris.dmc.seedcodec.CodecException;
 import edu.iris.dmc.seedcodec.DecompressedData;
 import edu.iris.dmc.seedcodec.UnsupportedCompressionType;
 import edu.iris.dmc.timeseries.model.Segment.Type;
-import edu.sc.seis.seisFile.mseed.Blockette;
-import edu.sc.seis.seisFile.mseed.Blockette100;
-import edu.sc.seis.seisFile.mseed.Blockette1000;
-import edu.sc.seis.seisFile.mseed.DataRecord;
-import edu.sc.seis.seisFile.mseed.SeedFormatException;
+import edu.sc.seis.seisFile.mseed.*;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Timeseries implements Serializable {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -7762713350314515989L;
-
 	Logger logger = Logger.getLogger("edu.iris.dmc.ws.seed.Timeseries");
-
-	private String networkCode; /* Network designation */
-	private String stationCode; /* Station designation */
-	private String location; /* Location designation */
-	private String channelCode; /* Channel designation */
-
+	private String networkCode;
+	private String stationCode;
+	private String location;
+	private String channelCode;
 	private Channel channel;
-
-	private Character quality;/* Data quality indicator */
-
-	private Collection<Segment> segments = new ArrayList<Segment>();
+	private Character quality;
+	private Collection<Segment> segments = new ArrayList<>();
+	private int offset = 0;
 
 	public Timeseries() {
 	}
 
-	public Timeseries(String networkCode, String stationCode, String location,
-			String channelCode) {
+	public Timeseries(String networkCode, String stationCode, String location, String channelCode) {
 		this.networkCode = networkCode.trim();
 		this.stationCode = stationCode.trim();
 		this.location = location;
 		this.channelCode = channelCode;
 	}
 
-	private int offset = 0;
-
-	public void add(Timestamp startTimestamp, DataRecord record)
-			throws UnsupportedCompressionType, CodecException,
-			SeedFormatException {
-
-		if (record == null || record.getData() == null) {
-			return;
-		}
-		int numberOfSamples = record.getHeader().getNumSamples();
-		if(numberOfSamples<1){
-			return;
-		}
-		
-		int format = -1;
-
-		Blockette1000 b1000 = (Blockette1000) record.getUniqueBlockette(1000);
-		format = b1000.getEncodingFormat();
-
-		byte[] data = record.getData();
-
-		Codec codec = new Codec();
-		float sampleRate = record.getHeader().getSampleRate();
-		
-		Blockette[] bs = record.getBlockettes(100);
-		if (bs != null && bs.length > 0) {
-			Blockette100 b100 = (Blockette100) bs[0];
-			sampleRate = b100.getActualSampleRate();
-		}
-		DecompressedData dData = codec.decompress(format, data,
-				numberOfSamples, false);
-
-		Type thisType = Type.values()[dData.getType() - 1];
-
-		boolean addNewSegment = true;
-
-		double durationinInSeconds = ((numberOfSamples - 1) / (double) sampleRate);
-
-		Timestamp endTime = startTimestamp;
-		// Timestamp endTime = new Timestamp(startTimestamp.getTime());
-		// endTime.setNanos(startTimestamp.getNanos());
-
-		SimpleDateFormat dfm = new SimpleDateFormat("yyyy,D,HH:mm:ss");
-		dfm.setTimeZone(TimeZone.getTimeZone("GMT"));
-		endTime = Util.addSeconds(endTime, durationinInSeconds);
-		endTime = Util.roundTime(endTime);
-
-		double halfPeriodinMillis = ((1 / sampleRate) / 2) * 1000;
-
-		if (logger.isLoggable(Level.FINER)) {
-			logger.finer("Tolerable Rate: " + halfPeriodinMillis
-					+ " Start Time: " + startTimestamp + " End Time: "
-					+ endTime + " Sample Rate: " + sampleRate);
-		}
-
-		for (Segment segment : this.segments) {
-			if (segment.getType() != thisType) {
-				if (logger.isLoggable(Level.FINER)) {
-					logger.finer("Not same type segment, so skipping: "
-							+ segment.getType() + "  " + dData.getType());
+	public void add(Timestamp startTimestamp, DataRecord record) throws UnsupportedCompressionType, CodecException, SeedFormatException {
+		if (record != null && record.getData() != null) {
+			int numberOfSamples = record.getHeader().getNumSamples();
+			if (numberOfSamples >= 1) {
+				Blockette1000 b1000 = (Blockette1000)record.getUniqueBlockette(1000);
+				int format = b1000.getEncodingFormat();
+				byte[] data = record.getData();
+				Codec codec = new Codec();
+				float sampleRate = record.getHeader().getSampleRate();
+				Blockette[] bs = record.getBlockettes(100);
+				if (bs != null && bs.length > 0) {
+					Blockette100 b100 = (Blockette100)bs[0];
+					sampleRate = b100.getActualSampleRate();
 				}
-				continue;
-			}
 
-			if (!Util.isRateTolerable(segment.getSamplerate(), sampleRate)) {
-				if (logger.isLoggable(Level.FINER)) {
-					logger.finer("Rate is not tolerable: "
-							+ segment.getSamplerate() + " " + sampleRate);
+				DecompressedData dData = codec.decompress(format, data, numberOfSamples, false);
+				Type thisType = Type.values()[dData.getType() - 1];
+				boolean addNewSegment = true;
+				double durationinInSeconds = (double)(numberOfSamples - 1) / (double)sampleRate;
+				Timestamp endTime = Util.addSeconds(startTimestamp, durationinInSeconds);
+				endTime = Util.roundTime(endTime);
+				double halfPeriodinMillis = (double)(1.0F / sampleRate / 2.0F * 1000.0F);
+				if (this.logger.isLoggable(Level.FINER)) {
+					this.logger.finer("Tolerable Rate: " + halfPeriodinMillis + " Start Time: " + startTimestamp + " End Time: " + endTime + " Sample Rate: " + sampleRate);
 				}
-				continue;
-			}
 
-			dfm.setTimeZone(TimeZone.getTimeZone("GMT"));
-			// if (endTime.getTime()<segment.getStartTime().getTime()) {
-			if (endTime.before(segment.getStartTime())) {
-				if (Math.abs(segment.getStartTime().getTime()
-						- endTime.getTime()) <= halfPeriodinMillis) {
-					if (logger.isLoggable(Level.FINER)) {
-						logger.finer("Appending to left: "
-								+ segment.getStartTime() + " " + endTime + "  "
-								+ halfPeriodinMillis);
+				Iterator var18 = this.segments.iterator();
+
+				while(var18.hasNext()) {
+					Segment segment = (Segment)var18.next();
+					if (segment.getType() != thisType) {
+						if (this.logger.isLoggable(Level.FINER)) {
+							this.logger.finer("Not same type segment, so skipping: " + segment.getType() + "  " + dData.getType());
+						}
+					} else if (!Util.isRateTolerable(segment.getSamplerate(), sampleRate)) {
+						if (this.logger.isLoggable(Level.FINER)) {
+							this.logger.finer("Rate is not tolerable: " + segment.getSamplerate() + " " + sampleRate);
+						}
+					} else {
+						if (endTime.before(segment.getStartTime()) && (double)Math.abs(segment.getStartTime().getTime() - endTime.getTime()) <= halfPeriodinMillis) {
+							if (this.logger.isLoggable(Level.FINER)) {
+								this.logger.finer("Appending to left: " + segment.getStartTime() + " " + endTime + "  " + halfPeriodinMillis);
+							}
+
+							segment.add(startTimestamp, endTime, dData, sampleRate, numberOfSamples, 0);
+							addNewSegment = false;
+							break;
+						}
+
+						if (startTimestamp.after(segment.getEndTime()) && (double)Math.abs(segment.getExpectedNextSampleTime().getTime() - startTimestamp.getTime()) <= halfPeriodinMillis) {
+							if (this.logger.isLoggable(Level.FINER)) {
+								this.logger.finer("Appending to right: " + segment.getExpectedNextSampleTime() + " " + startTimestamp + "  " + halfPeriodinMillis);
+							}
+
+							segment.addAfter(startTimestamp, endTime, dData, sampleRate, numberOfSamples);
+							addNewSegment = false;
+							break;
+						}
 					}
-					segment.add(startTimestamp, endTime, dData, sampleRate,
-							numberOfSamples, 0);
-					addNewSegment = false;
-					break;
-				} /*
-				 * else { if (logger.isLoggable(Level.FINER)) {
-				 * logger.finer("Left Time is not tolerable: " +
-				 * segment.getStartTime() + " " + endTime + "  " +
-				 * halfPeriodinMillis); } }
-				 */
-			}
+				}
 
-			// if (startTimestamp.getTime()>segment.getEndTime().getTime()) {
-			if (startTimestamp.after(segment.getEndTime())) {
-				if (Math.abs(segment.getExpectedNextSampleTime().getTime()
-						- startTimestamp.getTime()) <= halfPeriodinMillis) {
-					if (logger.isLoggable(Level.FINER)) {
-						logger.finer("Appending to right: "
-								+ segment.getExpectedNextSampleTime() + " "
-								+ startTimestamp + "  " + halfPeriodinMillis);
+				if (addNewSegment) {
+					if (this.logger.isLoggable(Level.FINER)) {
+						this.logger.finer("Adding new segment: " + startTimestamp + "  " + sampleRate + "  " + numberOfSamples);
 					}
-					segment.addAfter(startTimestamp, endTime, dData,
-							sampleRate, numberOfSamples);
-					addNewSegment = false;
-					break;
-				} /*
-				 * else { if (logger.isLoggable(Level.FINER)) {
-				 * logger.finer("Right Time is not tolerable: " +
-				 * segment.getExpectedNextSampleTime() + " " + startTimestamp +
-				 * "  " + (segment.getExpectedNextSampleTime() .getTime() -
-				 * startTimestamp.getTime()) + "   " + halfPeriodinMillis); } }
-				 */
-			}
 
-		}
+					Segment segment = new Segment(thisType, sampleRate);
+					segment.setTimeseries(this);
+					segment.add(startTimestamp, endTime, dData, sampleRate, numberOfSamples, 0);
+					this.segments.add(segment);
+				}
 
-		if (addNewSegment) {
-			if (logger.isLoggable(Level.FINER)) {
-				logger.finer("Adding new segment: " + startTimestamp + "  "
-						+ sampleRate + "  " + numberOfSamples);
-			}
-			Segment segment = new Segment(thisType, sampleRate);
-			segment.setTimeseries(this);
-			segment.add(startTimestamp, endTime, dData, sampleRate,
-					numberOfSamples, 0);
-			this.segments.add(segment);
-		}
+				this.offset += data.length - 1;
+				char character = record.getHeader().getTypeCode();
+				if (this.quality == null) {
+					this.quality = character;
+				} else if (!this.quality.equals(character)) {
+					this.quality = 'M';
+				}
 
-		offset += (data.length - 1);
-
-		char character = record.getHeader().getTypeCode();
-
-		if (this.quality == null) {
-			this.quality = character;
-		} else {
-			if (!this.quality.equals(character)) {
-				this.quality = 'M';
 			}
 		}
-
 	}
 
 	public Channel getChannel() {
-		return channel;
+		return this.channel;
 	}
 
 	public void setChannel(Channel channel) {
@@ -205,7 +136,7 @@ public class Timeseries implements Serializable {
 	}
 
 	public String getNetworkCode() {
-		return networkCode;
+		return this.networkCode;
 	}
 
 	public void setNetworkCode(String networkCode) {
@@ -213,7 +144,7 @@ public class Timeseries implements Serializable {
 	}
 
 	public String getStationCode() {
-		return stationCode;
+		return this.stationCode;
 	}
 
 	public void setStationCode(String stationCode) {
@@ -221,7 +152,7 @@ public class Timeseries implements Serializable {
 	}
 
 	public String getLocation() {
-		return location;
+		return this.location;
 	}
 
 	public void setLocation(String location) {
@@ -229,7 +160,7 @@ public class Timeseries implements Serializable {
 	}
 
 	public String getChannelCode() {
-		return channelCode;
+		return this.channelCode;
 	}
 
 	public void setChannelCode(String channelCode) {
@@ -241,63 +172,66 @@ public class Timeseries implements Serializable {
 	}
 
 	public Collection<Segment> getSegments() {
-		return segments;
+		return this.segments;
 	}
 
-	@Override
 	public int hashCode() {
-		final int prime = 31;
+		int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((channelCode == null) ? 0 : channelCode.hashCode());
-		result = prime * result;
-		result = prime * result
-				+ ((location == null) ? 0 : location.hashCode());
-		result = prime * result
-				+ ((networkCode == null) ? 0 : networkCode.hashCode());
-		result = prime * result
-				+ ((stationCode == null) ? 0 : stationCode.hashCode());
+		result = 31 * result + (this.channelCode == null ? 0 : this.channelCode.hashCode());
+		result = 31 * result;
+		result = 31 * result + (this.location == null ? 0 : this.location.hashCode());
+		result = 31 * result + (this.networkCode == null ? 0 : this.networkCode.hashCode());
+		result = 31 * result + (this.stationCode == null ? 0 : this.stationCode.hashCode());
 		return result;
 	}
 
-	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		} else if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		} else if (this.getClass() != obj.getClass()) {
 			return false;
-		Timeseries other = (Timeseries) obj;
-		if (channelCode == null) {
-			if (other.channelCode != null)
+		} else {
+			Timeseries other = (Timeseries)obj;
+			if (this.channelCode == null) {
+				if (other.channelCode != null) {
+					return false;
+				}
+			} else if (!this.channelCode.equals(other.channelCode)) {
 				return false;
-		} else if (!channelCode.equals(other.channelCode))
-			return false;
-		if (location == null) {
-			if (other.location != null)
+			}
+
+			if (this.location == null) {
+				if (other.location != null) {
+					return false;
+				}
+			} else if (!this.location.equals(other.location)) {
 				return false;
-		} else if (!location.equals(other.location))
-			return false;
-		if (networkCode == null) {
-			if (other.networkCode != null)
+			}
+
+			if (this.networkCode == null) {
+				if (other.networkCode != null) {
+					return false;
+				}
+			} else if (!this.networkCode.equals(other.networkCode)) {
 				return false;
-		} else if (!networkCode.equals(other.networkCode))
-			return false;
-		if (stationCode == null) {
-			if (other.stationCode != null)
+			}
+
+			if (this.stationCode == null) {
+				if (other.stationCode != null) {
+					return false;
+				}
+			} else if (!this.stationCode.equals(other.stationCode)) {
 				return false;
-		} else if (!stationCode.equals(other.stationCode))
-			return false;
-		return true;
+			}
+
+			return true;
+		}
 	}
 
-	@Override
 	public String toString() {
-		return "Timeseries [networkCode=" + networkCode + ", stationCode="
-				+ stationCode + ", location=" + location + ", channelCode="
-				+ channelCode + ", dataQuality=" + quality
-				+ ", numberOfSegments=" + this.segments.size() + "]";
+		return "Timeseries [networkCode=" + this.networkCode + ", stationCode=" + this.stationCode + ", location=" + this.location + ", channelCode=" + this.channelCode + ", dataQuality=" + this.quality + ", numberOfSegments=" + this.segments.size() + "]";
 	}
-
 }

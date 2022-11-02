@@ -7,6 +7,51 @@
 	<version>2.0.18</version>
 	<name>FDSN-IRIS-WS</name>
 	<url>http://maven.apache.org</url>
+	<properties>
+		<java.version>1.8</java.version>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.13</version>
+		</dependency>
+
+		<dependency>
+			<groupId>edu.iris.dmc</groupId>
+			<artifactId>fdsn-stationxml-model</artifactId>
+			<version>1.4.4</version>
+		</dependency>
+		<dependency>
+			<groupId>edu.iris</groupId>
+			<artifactId>quake-model</artifactId>
+			<version>1.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>edu.iris.dmc</groupId>
+			<artifactId>seed-codec</artifactId>
+			<version>1.0.7</version>
+		</dependency>
+
+		<dependency>
+			<groupId>edu.sc.seis</groupId>
+			<artifactId>seis-file</artifactId>
+			<version>1.5.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+
+
+
+	</dependencies>
 	<build>
 		<resources>
 			<resource>
@@ -20,8 +65,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.3</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>8</source>
+					<target>8</target>
 				</configuration>
 			</plugin>
 
@@ -66,44 +111,6 @@
 			<url>http://marvin2:8080/nexus/content/repositories/snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
-	<dependencies>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.5</version>
-		</dependency>
 
-		<dependency>
-			<groupId>edu.iris.dmc</groupId>
-			<artifactId>fdsn-stationxml-model</artifactId>
-			<version>1.4.4</version>
-		</dependency>
-		<dependency>
-			<groupId>edu.iris</groupId>
-			<artifactId>quake-model</artifactId>
-			<version>1.2.0</version>
-		</dependency>
-		<dependency>
-			<groupId>edu.iris.dmc</groupId>
-			<artifactId>seed-codec</artifactId>
-			<version>1.0.7</version>
-		</dependency>
-
-		<dependency>
-			<groupId>edu.sc.seis</groupId>
-			<artifactId>seis-file</artifactId>
-			<version>1.5.2</version>
-		</dependency>
-
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
-			<scope>test</scope>
-		</dependency>
-
-
-
-	</dependencies>
 
 </project>

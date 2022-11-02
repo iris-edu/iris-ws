@@ -1,21 +1,14 @@
 package edu.iris.dmc.event.model;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TimeZone;
+import edu.iris.quake.model.CreationInfo;
+import edu.iris.quake.model.RealQuantity;
+import edu.iris.quake.model.TimeQuantity;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
-
-import edu.iris.quake.model.CreationInfo;
-import edu.iris.quake.model.RealQuantity;
-import edu.iris.quake.model.TimeQuantity;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * This class represents an origin as described in the QuakeMl schema
