@@ -174,15 +174,15 @@ public class Metadata {
 
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
-		sb.append(this.network + "," + this.station + "," + this.location + "," + this.channel + ",");
-		sb.append(this.lat + "," + this.lon + "," + this.elev + "," + this.depth + "," + this.azimuth + "," + this.dip + ",");
-		sb.append(this.instrument + "," + this.sensitivity + "," + this.sensFreq + "," + this.sensUnits + "," + this.sampleRate);
+		sb.append(this.network).append(",").append(this.station).append(",").append(this.location).append(",").append(this.channel).append(",");
+		sb.append(this.lat).append(",").append(this.lon).append(",").append(this.elev).append(",").append(this.depth).append(",").append(this.azimuth).append(",").append(this.dip).append(",");
+		sb.append(this.instrument).append(",").append(this.sensitivity).append(",").append(this.sensFreq).append(",").append(this.sensUnits).append(",").append(this.sampleRate);
 		if (this.startDate != null) {
-			sb.append("," + sdf.format(this.startDate));
+			sb.append(",").append(sdf.format(this.startDate));
 		}
 
 		if (this.endDate != null) {
-			sb.append("," + sdf.format(this.endDate));
+			sb.append(",").append(sdf.format(this.endDate));
 		}
 
 		sb.append("\n");
@@ -193,21 +193,16 @@ public class Metadata {
 		if (networks == null) {
 			return null;
 		} else {
-			List<Metadata> lmd = new ArrayList();
-			Iterator var2 = networks.iterator();
+			List<Metadata> lmd = new ArrayList<>();
 
-			while(var2.hasNext()) {
-				Network n = (Network)var2.next();
-				Iterator var4 = n.getStations().iterator();
-
-				while(var4.hasNext()) {
-					Station s = (Station)var4.next();
+			for (Network n : networks) {
+				for (Station s : n.getStations()) {
 					String network = n.getCode();
 					String station = s.getCode();
 
 					Metadata md;
-					for(Iterator var8 = s.getChannels().iterator(); var8.hasNext(); lmd.add(md)) {
-						Channel c = (Channel)var8.next();
+					for (Iterator<Channel> it = s.getChannels().iterator(); it.hasNext(); lmd.add(md)) {
+						Channel c = (Channel) it.next();
 						md = new Metadata();
 						md.network = network.trim();
 						md.station = station.trim();
@@ -218,14 +213,14 @@ public class Metadata {
 
 						md.location = location.trim();
 						md.channel = c.getCode().trim();
-						md.lat = c.getLatitude()==null?0:c.getLatitude().getValue();
-						md.lon = c.getLongitude()==null?0:c.getLongitude().getValue();
-						md.elev = c.getElevation()==null?0:c.getElevation().getValue();
-						md.depth = c.getDepth()==null?0:c.getDepth().getValue();
-						md.azimuth = c.getAzimuth()==null?0:c.getAzimuth().getValue();
-						md.dip = c.getDip()==null?0:c.getDip().getValue();
-						md.instrument = c.getSensor()==null?null:c.getSensor().getType();
-						Sensitivity sens = c.getResponse()==null?null:c.getResponse().getInstrumentSensitivity();
+						md.lat = c.getLatitude() == null ? 0 : c.getLatitude().getValue();
+						md.lon = c.getLongitude() == null ? 0 : c.getLongitude().getValue();
+						md.elev = c.getElevation() == null ? 0 : c.getElevation().getValue();
+						md.depth = c.getDepth() == null ? 0 : c.getDepth().getValue();
+						md.azimuth = c.getAzimuth() == null ? 0 : c.getAzimuth().getValue();
+						md.dip = c.getDip() == null ? 0 : c.getDip().getValue();
+						md.instrument = c.getSensor() == null ? null : c.getSensor().getType();
+						Sensitivity sens = c.getResponse() == null ? null : c.getResponse().getInstrumentSensitivity();
 						if (sens != null) {
 							if (sens.getValue() != null) {
 								md.sensitivity = sens.getValue();

@@ -9,11 +9,11 @@ public final class WsToStringUtils {
 		if (ts == null) return "";
 		StringBuilder sb = new StringBuilder();
 		sb.append("TIMESERIES: ");
-		sb.append(" Network  : " + ts.getNetworkCode());
-		sb.append(" Station  : " + ts.getStationCode());
-		sb.append(" Channel  : " + ts.getChannelCode());
-		sb.append(" Location : " + ts.getLocation());
-		sb.append(" Quality  : " + ts.getDataQuality());
+		sb.append(" Network  : ").append(ts.getNetworkCode());
+		sb.append(" Station  : ").append(ts.getStationCode());
+		sb.append(" Channel  : ").append(ts.getChannelCode());
+		sb.append(" Location : ").append(ts.getLocation());
+		sb.append(" Quality  : ").append(ts.getDataQuality());
 		sb.append("\n");
 		for (Segment s: ts.getSegments()) {
 			sb.append(segmentToString(s));

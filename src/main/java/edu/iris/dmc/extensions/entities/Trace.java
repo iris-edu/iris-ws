@@ -284,7 +284,6 @@ public class Trace {
 			for(int i = 0; i < size; ++i) {
 				temp[i] = ((Number)this.data.get(i)).floatValue();
 			}
-
 			return temp;
 		}
 	}
@@ -307,12 +306,12 @@ public class Trace {
 	public String toString() {
 		DateFormat sdfm = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss:SSS");
 		StringBuffer sb = new StringBuffer();
-		sb.append(this.network + "," + this.station + "," + this.location + "," + this.channel + ",");
-		sb.append(this.latitude + "," + this.longitude + "," + this.elevation + "," + this.depth + "," + this.azimuth + "," + this.dip + ",");
-		sb.append(this.instrument + "," + this.sensitivity + "," + this.sensitivityFrequency + "," + this.sensitivityUnits + "," + this.sampleRate + ",");
-		sb.append(sdfm.format(this.startTime) + "," + sdfm.format(this.endTime) + "\n");
+		sb.append(this.network).append(",").append(this.station).append(",").append(this.location).append(",").append(this.channel).append(",");
+		sb.append(this.latitude).append(",").append(this.longitude).append(",").append(this.elevation).append(",").append(this.depth).append(",").append(this.azimuth).append(",").append(this.dip).append(",");
+		sb.append(this.instrument).append(",").append(this.sensitivity).append(",").append(this.sensitivityFrequency).append(",").append(this.sensitivityUnits).append(",").append(this.sampleRate).append(",");
+		sb.append(sdfm.format(this.startTime)).append(",").append(sdfm.format(this.endTime)).append("\n");
 		if (this.data != null) {
-			sb.append(" " + this.data.size() + " samples");
+			sb.append(" ").append(this.data.size()).append(" samples");
 		} else {
 			sb.append(" NO DATA");
 		}

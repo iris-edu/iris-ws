@@ -7,7 +7,6 @@ package edu.iris.dmc.ws.util;
 
 import edu.iris.dmc.fdsn.station.model.Float;
 import edu.iris.dmc.fdsn.station.model.*;
-import edu.iris.dmc.sacpz.model.Pole;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.*;
@@ -15,7 +14,6 @@ import java.math.RoundingMode;
 import java.text.*;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 public class RespUtil {

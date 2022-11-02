@@ -65,20 +65,20 @@ public class SacUtil {
 
 	public static String getSacFilename(Trace trace) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(trace.getNetwork() + "." + trace.getStation() + "." + trace.getLocation() + "." + trace.getChannel() + ".");
+		sb.append(trace.getNetwork()).append(".").append(trace.getStation()).append(".").append(trace.getLocation()).append(".").append(trace.getChannel()).append(".");
 		if (trace.getQuality() == null) {
 			sb.append("_.");
 		} else {
-			sb.append(trace.getQuality() + ".");
+			sb.append(trace.getQuality()).append(".");
 		}
 
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 		cal.setTime(trace.getStartTime());
-		sb.append(cal.get(1) + ",");
-		sb.append(String.format("%02d", cal.get(6)) + ",");
-		sb.append(String.format("%02d", cal.get(11)) + ":");
-		sb.append(String.format("%02d", cal.get(12)) + ":");
-		sb.append(String.format("%02d", cal.get(13)) + ".SAC");
+		sb.append(cal.get(1)).append(",");
+		sb.append(String.format("%02d", cal.get(6))).append(",");
+		sb.append(String.format("%02d", cal.get(11))).append(":");
+		sb.append(String.format("%02d", cal.get(12))).append(":");
+		sb.append(String.format("%02d", cal.get(13))).append(".SAC");
 		return sb.toString();
 	}
 }
