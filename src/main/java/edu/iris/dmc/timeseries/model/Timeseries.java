@@ -51,7 +51,7 @@ public class Timeseries implements Serializable {
 				int format = b1000.getEncodingFormat();
 				byte[] data = record.getData();
 				Codec codec = new Codec();
-				float sampleRate = record.getHeader().getSampleRate();
+				float sampleRate = record.getHeader().getSampleRateFactor();
 				Blockette[] bs = record.getBlockettes(100);
 				if (bs != null && bs.length > 0) {
 					Blockette100 b100 = (Blockette100)bs[0];
