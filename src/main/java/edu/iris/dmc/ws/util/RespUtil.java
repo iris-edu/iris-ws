@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
 package edu.iris.dmc.ws.util;
 
 import edu.iris.dmc.fdsn.station.model.Float;

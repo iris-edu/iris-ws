@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
 package edu.iris.dmc.ws.util;
 
 import java.text.ParseException;
@@ -12,19 +7,14 @@ import java.util.TimeZone;
 
 public class DateUtil {
 	private static final String SHORT_DATE = "yyyy-MM-dd";
-	private static String[] patterns = new String[]{"yyyy-MM-dd", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd' 'HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss.SSS", "yyyy-MM-dd' 'HH:mm:ss.SSS", "yyyy,DDD,HH:mm:ss", "yyyy,DDD,HH:mm:ss"};
+	private static final String[] patterns = new String[]{"yyyy-MM-dd", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd' 'HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss.SSS", "yyyy-MM-dd' 'HH:mm:ss.SSS", "yyyy,DDD,HH:mm:ss", "yyyy,DDD,HH:mm:ss"};
 
 	public DateUtil() {
 	}
 
 	public static Date parseAny(String dateString) throws ParseException {
 		if (dateString != null && !dateString.trim().isEmpty()) {
-			String[] var1 = patterns;
-			int var2 = var1.length;
-
-			for(int var3 = 0; var3 < var2; ++var3) {
-				String pattern = var1[var3];
-
+			for (String pattern : patterns) {
 				try {
 					if (dateString.length() <= pattern.length()) {
 						SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);

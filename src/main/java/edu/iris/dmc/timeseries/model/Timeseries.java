@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
 package edu.iris.dmc.timeseries.model;
 
 import edu.iris.dmc.fdsn.station.model.Channel;
@@ -69,10 +64,7 @@ public class Timeseries implements Serializable {
 					this.logger.finer("Tolerable Rate: " + halfPeriodinMillis + " Start Time: " + startTimestamp + " End Time: " + endTime + " Sample Rate: " + sampleRate);
 				}
 
-				Iterator var18 = this.segments.iterator();
-
-				while(var18.hasNext()) {
-					Segment segment = (Segment)var18.next();
+				for (Segment segment : this.segments) {
 					if (segment.getType() != thisType) {
 						if (this.logger.isLoggable(Level.FINER)) {
 							this.logger.finer("Not same type segment, so skipping: " + segment.getType() + "  " + dData.getType());
@@ -82,7 +74,7 @@ public class Timeseries implements Serializable {
 							this.logger.finer("Rate is not tolerable: " + segment.getSamplerate() + " " + sampleRate);
 						}
 					} else {
-						if (endTime.before(segment.getStartTime()) && (double)Math.abs(segment.getStartTime().getTime() - endTime.getTime()) <= halfPeriodinMillis) {
+						if (endTime.before(segment.getStartTime()) && (double) Math.abs(segment.getStartTime().getTime() - endTime.getTime()) <= halfPeriodinMillis) {
 							if (this.logger.isLoggable(Level.FINER)) {
 								this.logger.finer("Appending to left: " + segment.getStartTime() + " " + endTime + "  " + halfPeriodinMillis);
 							}
@@ -92,7 +84,7 @@ public class Timeseries implements Serializable {
 							break;
 						}
 
-						if (startTimestamp.after(segment.getEndTime()) && (double)Math.abs(segment.getExpectedNextSampleTime().getTime() - startTimestamp.getTime()) <= halfPeriodinMillis) {
+						if (startTimestamp.after(segment.getEndTime()) && (double) Math.abs(segment.getExpectedNextSampleTime().getTime() - startTimestamp.getTime()) <= halfPeriodinMillis) {
 							if (this.logger.isLoggable(Level.FINER)) {
 								this.logger.finer("Appending to right: " + segment.getExpectedNextSampleTime() + " " + startTimestamp + "  " + halfPeriodinMillis);
 							}
@@ -110,7 +102,7 @@ public class Timeseries implements Serializable {
 					}
 
 					Segment segment = new Segment(thisType, sampleRate);
-					segment.setTimeseries(this);
+					//segment.setTimeseries(this);
 					segment.add(startTimestamp, endTime, dData, sampleRate, numberOfSamples, 0);
 					this.segments.add(segment);
 				}
@@ -122,7 +114,6 @@ public class Timeseries implements Serializable {
 				} else if (!this.quality.equals(character)) {
 					this.quality = 'M';
 				}
-
 			}
 		}
 	}
@@ -220,14 +211,8 @@ public class Timeseries implements Serializable {
 			}
 
 			if (this.stationCode == null) {
-				if (other.stationCode != null) {
-					return false;
-				}
-			} else if (!this.stationCode.equals(other.stationCode)) {
-				return false;
-			}
-
-			return true;
+				return other.stationCode == null;
+			} else return this.stationCode.equals(other.stationCode);
 		}
 	}
 

@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
 package edu.iris.dmc.ws.util;
 
 import edu.iris.dmc.fdsn.station.model.*;
@@ -16,10 +11,9 @@ import java.util.Iterator;
 import java.util.List;
 
 public class TextStreamUtil {
-	private static ObjectFactory objectFactory = new ObjectFactory();
-	private static DatatypeFactory datatypeFactory;
+	private static final ObjectFactory objectFactory = new ObjectFactory();
 
-	public TextStreamUtil() {
+	private TextStreamUtil() {
 	}
 
 	public static Network buildNetwork(List<String> columns) throws IOException {
@@ -46,13 +40,11 @@ public class TextStreamUtil {
 				message = message + " null";
 			} else {
 				message = message + columns.size() + " ";
-
 				String s;
-				for(Iterator var2 = columns.iterator(); var2.hasNext(); message = message + "[" + s + "]") {
-					s = (String)var2.next();
+				for(Iterator<String> it = columns.iterator(); it.hasNext(); message = message + "[" + s + "]") {
+					s = (String)it.next();
 				}
 			}
-
 			throw new IOException(message);
 		}
 	}
@@ -212,7 +204,6 @@ public class TextStreamUtil {
 					s = (String)list.get(14);
 					channel.setEndDate(DateUtil.parseAny(s));
 				}
-
 				return channel;
 			} catch (ParseException var7) {
 				throw new IOException(var7);
@@ -223,22 +214,11 @@ public class TextStreamUtil {
 				message = message + " null";
 			} else {
 				message = message + list.size() + " ";
-
-				for(Iterator var2 = list.iterator(); var2.hasNext(); message = message + "[" + s + "]") {
-					s = (String)var2.next();
+				for(Iterator<String> it = list.iterator(); it.hasNext(); message = message + "[" + s + "]") {
+					s = (String)it.next();
 				}
 			}
-
 			throw new IOException(message);
 		}
-	}
-
-	static {
-		try {
-			datatypeFactory = DatatypeFactory.newInstance();
-		} catch (DatatypeConfigurationException var1) {
-			var1.printStackTrace();
-		}
-
 	}
 }

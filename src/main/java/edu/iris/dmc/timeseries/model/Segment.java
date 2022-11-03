@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
 package edu.iris.dmc.timeseries.model;
 
 import edu.iris.dmc.seedcodec.DecompressedData;
@@ -11,22 +6,33 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.List;
 
 public class Segment implements Serializable, Comparable<Segment> {
 	private static final long serialVersionUID = 6055844360696344359L;
-	private Timeseries timeseries;
+
+	public static enum Type {
+		SHORT,
+		INT24,
+		INTEGER,
+		FLOAT,
+		DOUBLE;
+
+		private Type() {
+		}
+	}
+
+
 	private float samplerate;
 	private Timestamp startTime;
 	private Timestamp endTime;
 	private Timestamp expectedNextSampleTime;
 	private Segment.Type type;
 	private int sampleCount = 0;
-	private List<int[]> intList = new ArrayList();
-	private List<short[]> shortList = new ArrayList();
-	private List<double[]> doubleList = new ArrayList();
-	private List<float[]> floatList = new ArrayList();
+	private final List<int[]> intList = new ArrayList<>();
+	private final List<short[]> shortList = new ArrayList<>();
+	private final List<double[]> doubleList = new ArrayList<>();
+	private final List<float[]> floatList = new ArrayList<>();
 
 	public Segment() {
 	}
@@ -149,10 +155,6 @@ public class Segment implements Serializable, Comparable<Segment> {
 
 	}
 
-	public void setTimeseries(Timeseries ts) {
-		this.timeseries = ts;
-	}
-
 	public Timestamp getStartTime() {
 		return this.startTime;
 	}
@@ -178,16 +180,10 @@ public class Segment implements Serializable, Comparable<Segment> {
 	}
 
 	public List<Integer> getIntData() {
-		List<Integer> l = new ArrayList();
-		Iterator var2 = this.intList.iterator();
+		List<Integer> l = new ArrayList<>();
 
-		while(var2.hasNext()) {
-			int[] i = (int[])var2.next();
-			int[] var4 = i;
-			int var5 = i.length;
-
-			for(int var6 = 0; var6 < var5; ++var6) {
-				int n = var4[var6];
+		for (int[] ints : this.intList) {
+			for (int n : ints) {
 				l.add(n);
 			}
 		}
@@ -196,56 +192,32 @@ public class Segment implements Serializable, Comparable<Segment> {
 	}
 
 	public List<Short> getShortData() {
-		List<Short> l = new ArrayList();
-		Iterator var2 = this.shortList.iterator();
-
-		while(var2.hasNext()) {
-			short[] i = (short[])var2.next();
-			short[] var4 = i;
-			int var5 = i.length;
-
-			for(int var6 = 0; var6 < var5; ++var6) {
-				short n = var4[var6];
+		List<Short> l = new ArrayList<>();
+		for (short[] shorts : this.shortList) {
+			for (short n : shorts) {
 				l.add(n);
 			}
 		}
-
 		return l;
 	}
 
 	public List<Float> getFloatData() {
-		List<Float> l = new ArrayList();
-		Iterator var2 = this.floatList.iterator();
-
-		while(var2.hasNext()) {
-			float[] i = (float[])var2.next();
-			float[] var4 = i;
-			int var5 = i.length;
-
-			for(int var6 = 0; var6 < var5; ++var6) {
-				float n = var4[var6];
+		List<Float> l = new ArrayList<>();
+		for (float[] floats : this.floatList) {
+			for (float n : floats) {
 				l.add(n);
 			}
 		}
-
 		return l;
 	}
 
 	public List<Double> getDoubleData() {
-		List<Double> l = new ArrayList();
-		Iterator var2 = this.doubleList.iterator();
-
-		while(var2.hasNext()) {
-			double[] i = (double[])var2.next();
-			double[] var4 = i;
-			int var5 = i.length;
-
-			for(int var6 = 0; var6 < var5; ++var6) {
-				double n = var4[var6];
+		List<Double> l = new ArrayList<>();
+		for (double[] doubles : this.doubleList) {
+			for (double n : doubles) {
 				l.add(n);
 			}
 		}
-
 		return l;
 	}
 
@@ -266,14 +238,8 @@ public class Segment implements Serializable, Comparable<Segment> {
 		} else {
 			Segment other = (Segment)obj;
 			if (this.startTime == null) {
-				if (other.startTime != null) {
-					return false;
-				}
-			} else if (!this.startTime.equals(other.startTime)) {
-				return false;
-			}
-
-			return true;
+				return other.startTime == null;
+			} else return this.startTime.equals(other.startTime);
 		}
 	}
 
@@ -284,17 +250,6 @@ public class Segment implements Serializable, Comparable<Segment> {
 			return 1;
 		} else {
 			return this.startTime.before(ts.getStartTime()) ? -1 : 0;
-		}
-	}
-
-	public static enum Type {
-		SHORT,
-		INT24,
-		INTEGER,
-		FLOAT,
-		DOUBLE;
-
-		private Type() {
 		}
 	}
 }

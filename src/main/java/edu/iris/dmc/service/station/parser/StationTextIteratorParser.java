@@ -13,18 +13,16 @@ import java.util.Arrays;
 import java.util.List;
 
 public class StationTextIteratorParser implements IterableStationParser {
-	protected InputStream inputStream;
 	private boolean isClosed = false;
 	protected OutputLevel level;
-	private BufferedReader reader;
+	private final BufferedReader reader;
 	private Network network;
 	private Station station;
 	private String lineRead;
 
 	public StationTextIteratorParser(InputStream is, OutputLevel level) {
-		this.inputStream = is;
 		this.level = level;
-		this.reader = new BufferedReader(new InputStreamReader(this.inputStream));
+		this.reader = new BufferedReader(new InputStreamReader(is));
 	}
 
 	String getLine() throws IOException {
@@ -56,9 +54,9 @@ public class StationTextIteratorParser implements IterableStationParser {
 					this.network.setCode(columns[0]);
 				}
 
-				List list;
+
 				if (this.level == OutputLevel.STATION) {
-					list = Arrays.asList(Arrays.copyOfRange(columns, 1, columns.length));
+					List<String> list = Arrays.asList(Arrays.copyOfRange(columns, 1, columns.length));
 					this.station = TextStreamUtil.buildStation(list);
 					this.network.addStation(this.station);
 					this.lineRead = null;
@@ -69,7 +67,7 @@ public class StationTextIteratorParser implements IterableStationParser {
 					this.station = new Station();
 					this.station.setCode(columns[1]);
 					this.network.addStation(this.station);
-					list = Arrays.asList(Arrays.copyOfRange(columns, 2, columns.length));
+					List<String> list = Arrays.asList(Arrays.copyOfRange(columns, 2, columns.length));
 					this.station.addChannel(TextStreamUtil.buildChannel(list));
 					this.lineRead = null;
 				} else {
@@ -80,7 +78,7 @@ public class StationTextIteratorParser implements IterableStationParser {
 					}
 
 					this.lineRead = null;
-					list = Arrays.asList(Arrays.copyOfRange(columns, 2, columns.length));
+					List<String> list = Arrays.asList(Arrays.copyOfRange(columns, 2, columns.length));
 					this.station.addChannel(TextStreamUtil.buildChannel(list));
 				}
 			}
@@ -98,9 +96,8 @@ public class StationTextIteratorParser implements IterableStationParser {
 		} else {
 			try {
 				return this.getLine() != null;
-			} catch (IOException var2) {
-				System.err.println("StationTextIteratorParser: Unable to read buffer, printing stack trace");
-				var2.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 				return false;
 			}
 		}
@@ -115,10 +112,7 @@ public class StationTextIteratorParser implements IterableStationParser {
 	}
 
 	public void close() throws IOException {
-		if (this.reader != null) {
-			this.reader.close();
-		}
-
+		this.reader.close();
 		this.isClosed = true;
 	}
 }
