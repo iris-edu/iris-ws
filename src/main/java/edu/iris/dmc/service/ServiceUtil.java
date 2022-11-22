@@ -1,19 +1,19 @@
 package edu.iris.dmc.service;
 
 public class ServiceUtil {
-	private static String STATION_SERVICE_DEFAULT_URL = "http://service.iris.edu/fdsnws/station/1/";
-	private static String EVENT_SERVICE_DEFAULT_URL = "http://service.iris.edu/fdsnws/event/1/";
-	private static String DATASELECT_SERVICE_DEFAULT_URL = "http://service.iris.edu/fdsnws/dataselect/1/";
-	private static String SACPZ_SERVICE_DEFAULT_URL = "http://service.iris.edu/irisws/sacpz/1/";
-	private static String RESP_SERVICE_DEFAULT_URL = "http://service.iris.edu/irisws/resp/1/";
-	private static String STATION_VERSION = "1.1";
-	private static String RESP_VERSION = "1.5.1";
-	private static String EVENT_VERSION = "1.0";
-	private static String SACPZ_VERSION = "1.1.1";
-	private static String BULKDATASELECT_VERSION = "1.0";
-	private static String DEFAULT_USER_AGENT = "IRIS-WS-Library";
-	private static String VERSION = "2.0.17";
-	private static ServiceUtil instance = new ServiceUtil();
+	private static final String STATION_SERVICE_DEFAULT_URL = "http://service.iris.edu/fdsnws/station/1/";
+	private static final String EVENT_SERVICE_DEFAULT_URL = "http://service.iris.edu/fdsnws/event/1/";
+	private static final String DATASELECT_SERVICE_DEFAULT_URL = "http://service.iris.edu/fdsnws/dataselect/1/";
+	private static final String SACPZ_SERVICE_DEFAULT_URL = STATION_SERVICE_DEFAULT_URL;//"http://service.iris.edu/irisws/sacpz/1/";
+	private static final String RESP_SERVICE_DEFAULT_URL = "http://service.iris.edu/irisws/resp/1/";
+	private static final String STATION_VERSION = "1.1";
+	private static final String RESP_VERSION = "1.5.1";
+	private static final String EVENT_VERSION = "1.0";
+	private static final String SACPZ_VERSION = "1.1.1";
+	private static final String BULKDATASELECT_VERSION = "1.0";
+	private static final String DEFAULT_USER_AGENT = "IRIS-WS-Library";
+	private static final String VERSION = "2.0.17";
+	private static final ServiceUtil instance = new ServiceUtil();
 	private StationService stationService;
 	private WaveformService waveformService;
 	private EventService eventService;
@@ -38,8 +38,7 @@ public class ServiceUtil {
 	}
 
 	public StationService getStationService() {
-		String stationUrl = STATION_SERVICE_DEFAULT_URL;
-		return this.getStationService(stationUrl);
+		return this.getStationService(STATION_SERVICE_DEFAULT_URL);
 	}
 
 	public StationService getStationService(String url) {

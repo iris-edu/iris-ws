@@ -1,5 +1,6 @@
 package edu.iris.dmc.extensions.fetch;
 
+import edu.iris.dmc.criteria.Criteria;
 import edu.iris.dmc.criteria.StationCriteria;
 import edu.iris.dmc.extensions.entities.Trace;
 import edu.iris.dmc.service.ServiceUtil;
@@ -18,6 +19,17 @@ public class TraceDataTest {
 		Trace[] traces = TraceData.fetchTraces("IU", "ANMO", "00", "BHZ", "2010-01-01 00:00:00.000",
 				"2010-01-01 01:00:00.000", 'M', false, null, null);
 		
+		for(Trace trace:traces) {
+			System.out.println(trace);
+			assertEquals(72000,trace.getSampleCount());
+		}
+	}
+
+	@Test
+	public void fetchIUNoQuality() throws Exception {
+		Trace[] traces = TraceData.fetchTraces("IU", "ANMO", "00", "BHZ", "2010-01-01 00:00:00.000",
+				"2010-01-01 01:00:00.000", false, null, null);
+
 		for(Trace trace:traces) {
 			System.out.println(trace);
 			assertEquals(72000,trace.getSampleCount());
@@ -81,8 +93,7 @@ public class TraceDataTest {
 		ServiceUtil su=ServiceUtil.getInstance();
 		StationService ss=su.getStationService("http://wsbeta1:8080/fdsnwsbeta/station/1/");
 		System.out.println("base url: "+ss.getBaseUrl());
-		StationCriteria sc=new StationCriteria();
-		sc.addNetwork("IU");
-		ss.fetch(sc);
+		Criteria criteria=StationCriteria.builder().netCode("IU").build();
+		ss.fetch(criteria);
 	}
 }

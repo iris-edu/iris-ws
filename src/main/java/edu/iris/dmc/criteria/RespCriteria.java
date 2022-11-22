@@ -3,10 +3,7 @@ package edu.iris.dmc.criteria;
 import edu.iris.dmc.ws.util.DateUtil;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * RespCriteria is a simple criteria builder to retrieve Resp data
@@ -21,18 +18,23 @@ public class RespCriteria implements Criteria {
 	private String chanCode;
 	private String locCode;
 
+	@Override
+	public Map<String, List<String>> toMapUrlParameters() {
+		Map<String, List<String>> map = new TreeMap<>();
+		return map;
+	}
 	public List<String> toUrlParams() throws CriteriaException {
 		StringBuilder string = new StringBuilder();
 		boolean and = false;
 		if (this.netCode != null) {
-			string.append("net=" + this.netCode);
+			string.append("net=").append(this.netCode);
 			and = true;
 		}
 		if (this.staCode != null) {
 			if (and) {
 				string.append("&");
 			}
-			string.append("sta=" + this.staCode);
+			string.append("sta=").append(this.staCode);
 			and = true;
 		}
 
@@ -40,7 +42,7 @@ public class RespCriteria implements Criteria {
 			if (and) {
 				string.append("&");
 			}
-			string.append("cha=" + this.chanCode);
+			string.append("cha=").append(this.chanCode);
 			and = true;
 		}
 
@@ -92,8 +94,8 @@ public class RespCriteria implements Criteria {
 		if (this.staCode == null) {
 			this.staCode = staCode;
 		} else {
-			this.staCode = new StringBuilder(this.staCode)
-					.append("," + staCode).toString();
+			this.staCode = this.staCode +
+					"," + staCode;
 		}
 
 		return this;
@@ -110,8 +112,8 @@ public class RespCriteria implements Criteria {
 		if (this.netCode == null) {
 			this.netCode = netCode;
 		} else {
-			this.netCode = new StringBuilder(this.netCode)
-					.append("," + netCode).toString();
+			this.netCode = this.netCode +
+					"," + netCode;
 		}
 		return this;
 	}
@@ -127,8 +129,8 @@ public class RespCriteria implements Criteria {
 		if (this.chanCode == null) {
 			this.chanCode = channel;
 		} else {
-			this.chanCode = new StringBuilder(this.chanCode).append(
-					"," + channel).toString();
+			this.chanCode = this.chanCode +
+					"," + channel;
 		}
 		return this;
 	}
@@ -147,8 +149,8 @@ public class RespCriteria implements Criteria {
 		if (this.locCode == null) {
 			this.locCode = location;
 		} else {
-			this.locCode = new StringBuilder(this.locCode).append(
-					"," + location).toString();
+			this.locCode = this.locCode +
+					"," + location;
 		}
 		return this;
 	}

@@ -58,11 +58,17 @@ public class TraceData {
 		VERBOSE = verbose;
 	}
 
-	public static Trace[] fetchTraces(String network, String station, String location, String channel, String startDateStr, String endDateStr, char qualityChar, boolean includePolesZeros) throws Exception {
-		return fetchTraces(network, station, location, channel, (String)startDateStr, (String)endDateStr, qualityChar, includePolesZeros, (String)null, (String)null);
+	public static Trace[] fetchTraces(String network, String station, String location, String channel, String startDateStr, String endDateStr, boolean includePolesZeros) throws Exception {
+		return fetchTraces(network, station, location, channel, startDateStr, endDateStr, null, includePolesZeros,
+				null, null);
 	}
 
-	public static Trace[] fetchTraces(String network, String station, String location, String channel, String startDateStr, String endDateStr, char qualityChar, boolean includePolesZeros, String username, String password) throws Exception {
+	public static Trace[] fetchTraces(String network, String station, String location, String channel, String startDateStr, String endDateStr, Character qualityChar, boolean includePolesZeros) throws Exception {
+		return fetchTraces(network, station, location, channel, startDateStr, endDateStr, qualityChar, includePolesZeros,
+				null, null);
+	}
+
+	public static Trace[] fetchTraces(String network, String station, String location, String channel, String startDateStr, String endDateStr, Character qualityChar, boolean includePolesZeros, String username, String password) throws Exception {
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 		new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS");
 		Date startDate = DateUtil.parseAny(startDateStr);
@@ -70,28 +76,38 @@ public class TraceData {
 		return fetchTraces(network, station, location, channel, startDate, endDate, qualityChar, includePolesZeros, username, password);
 	}
 
-	public static Trace[] fetchTraces(String network, String station, String location, String channel, Date startDate, Date endDate, char qualityChar, boolean includePolesZeros) throws IOException, NoDataFoundException, CriteriaException, Exception {
-		return fetchTraces(network, station, location, channel, (Date)startDate, (Date)endDate, qualityChar, includePolesZeros, (String)null, (String)null);
+	public static Trace[] fetchTraces(String network, String station, String location, String channel, String startDateStr, String endDateStr, boolean includePolesZeros, String username, String password) throws Exception {
+		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+		new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS");
+		Date startDate = DateUtil.parseAny(startDateStr);
+		Date endDate = DateUtil.parseAny(endDateStr);
+		return fetchTraces(network, station, location, channel, startDate, endDate, null, includePolesZeros, username, password);
 	}
 
-	public static Trace[] fetchTraces(String network, String station, String location, String channel, Date startDate, Date endDate, char qualityChar, boolean includePolesZeros, String username, String password) throws IOException, NoDataFoundException, CriteriaException, Exception {
-		StationCriteria sc = new StationCriteria();
-		sc.addNetwork(network).addStation(station).addLocation(location).addChannel(channel);
-		sc.setStartTime(startDate).setEndTime(endDate);
+	public static Trace[] fetchTraces(String network, String station, String location, String channel, Date startDate, Date endDate, Character qualityChar, boolean includePolesZeros) throws Exception {
+		return fetchTraces(network, station, location, channel, startDate, endDate, qualityChar, includePolesZeros, null, null);
+	}
+
+	public static Trace[] fetchTraces(String network, String station, String location, String channel, Date startDate, Date endDate, Character qualityChar, boolean includePolesZeros, String username, String password) throws Exception {
+		//StationCriteria sc = new StationCriteria();
+		StationCriteria sc = StationCriteria.builder().netCode(network).staCode(station).locCode(location).chanCode(channel).
+				startTime(startDate).endTime(endDate).build();
+		//sc.addNetwork(network).addStation(station).addLocation(location).addChannel(channel);
+		//sc.setStartTime(startDate).setEndTime(endDate);
 		StationCriteria[] asc = new StationCriteria[]{sc};
 		return fetchTraces(asc, qualityChar, includePolesZeros, username, password);
 	}
 
-	public static Trace[] fetchTraces(StationCriteria[] aSc, boolean includePolesZeros) throws IOException, NoDataFoundException, CriteriaException, Exception {
-		return fetchTraces(aSc, (Character)null, includePolesZeros, (String)null, (String)null);
+	public static Trace[] fetchTraces(StationCriteria[] aSc, boolean includePolesZeros) throws Exception {
+		return fetchTraces(aSc, null, includePolesZeros, null, null);
 	}
 
-	public static Trace[] fetchTraces(StationCriteria[] aSc, String username, String password, boolean includePolesZeros) throws IOException, NoDataFoundException, CriteriaException, Exception {
-		return fetchTraces(aSc, (Character)null, includePolesZeros, username, password);
+	public static Trace[] fetchTraces(StationCriteria[] aSc, String username, String password, boolean includePolesZeros) throws Exception {
+		return fetchTraces(aSc, null, includePolesZeros, username, password);
 	}
 
-	public static Trace[] fetchTraces(StationCriteria[] aSc, Character qualityChar, boolean includePolesZeros) throws IOException, NoDataFoundException, CriteriaException, Exception {
-		return fetchTraces(aSc, qualityChar, includePolesZeros, (String)null, (String)null);
+	public static Trace[] fetchTraces(StationCriteria[] aSc, Character qualityChar, boolean includePolesZeros) throws Exception {
+		return fetchTraces(aSc, qualityChar, includePolesZeros, null, null);
 	}
 
 	public static Trace[] fetchTraces(StationCriteria[] aSc, Character qualityChar, String username, String password, boolean includePolesZeros) throws IOException, NoDataFoundException, CriteriaException, Exception {
@@ -101,13 +117,13 @@ public class TraceData {
 	public static Trace[] fetchTraces(StationCriteria[] aSc, Character qualityChar, boolean includePolesZeros, String username, String password) throws IOException, NoDataFoundException, CriteriaException, Exception {
 		DateFormat sdfm = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 		List<Trace> lTraces = new ArrayList<>();
-		ServiceUtil serviceUtil = null;
+		ServiceUtil serviceUtil;
 		serviceUtil = ServiceUtil.getInstance();
 		StationService ss = serviceUtil.getStationService();
 		if (BASE_URL != null || STATION_URL != null) {
 			if (BASE_URL != null) {
 				ss.setBaseUrl(BASE_URL + "/fdsnws/station/1/");
-			} else if (STATION_URL != null) {
+			} else {
 				ss.setBaseUrl(STATION_URL);
 			}
 		}
@@ -117,7 +133,7 @@ public class TraceData {
 			logger.info("StationService url set to: " + ss.getBaseUrl());
 		}
 
-		List<Network> ln = null;
+		List<Network> ln;
 
 		for (StationCriteria sc : aSc) {
 			try {
@@ -127,8 +143,8 @@ public class TraceData {
 					logger.info(var28.getMessage());
 				}
 				continue;
-			} catch (Exception var29) {
-				throw new IOException(var29);
+			} catch (Exception e) {
+				throw new IOException(e);
 			}
 
 			List<Metadata> lmd = Metadata.parseMetadata(ln);
@@ -138,25 +154,21 @@ public class TraceData {
 				if (BASE_URL != null) {
 					ws.setBaseUrl(BASE_URL + "/fdsnws/dataselect/1/");
 				}
-
 				if (WAVEFORM_URL != null) {
 					ws.setBaseUrl(WAVEFORM_URL);
 				}
 			}
-
 			if (VERBOSE) {
 				logger.info("WaveService url set to: " + ws.getBaseUrl());
 			}
-
 			ws.setAppName(APP_NAME);
 			WaveformCriteria wc = new WaveformCriteria();
 			if (qualityChar != null) {
 				wc.setQuality(QualityLookup.getQualityFromChar(qualityChar));
 			}
-
 			for (Metadata md : lmd) {
-				Date segStartDate = null;
-				Date segEndDate = null;
+				Date segStartDate;
+				Date segEndDate;
 				if (md.getStartDate().before(sc.getStartTime())) {
 					segStartDate = sc.getStartTime();
 				} else {
@@ -166,22 +178,19 @@ public class TraceData {
 				if (md.getEndDate() != null && !md.getEndDate().after(sc.getEndTime())) {
 					double dpad = 1.0D / md.getSampleRate() * 0.75D;
 					long lpad = Math.round(dpad * 1000.0D);
-					long l = 0L;
+					long l;
 					if (md.getEndDate() == null) {
 						l = (new Date()).getTime();
 					} else {
 						l = md.getEndDate().getTime();
 					}
-
 					segEndDate = new Date(l - lpad);
 				} else {
 					segEndDate = sc.getEndTime();
 				}
-
 				wc.add(md.getNetwork(), md.getStation(), md.getLocation(), md.getChannel(), segStartDate, segEndDate);
 				usrMessage("Requesting: " + md.getNetwork() + " " + md.getStation() + " " + md.getLocation() + " " + md.getChannel() + " " + sdfm.format(segStartDate) + " " + (segEndDate == null ? "*" : sdfm.format(segEndDate)));
 			}
-
 			usrMessage("Fetching waveform data");
 
 			List<Timeseries> lts;
@@ -193,7 +202,7 @@ public class TraceData {
 					lts = ws.fetch(wc);
 				}
 			} catch (NoDataFoundException var27) {
-				usrMessage("No data found for \n" + wc.toString());
+				usrMessage("No data found for \n" + wc);
 				continue;
 			}
 
@@ -210,36 +219,34 @@ public class TraceData {
 				}
 			}
 
-			for (Object lt : lts) {
-				Timeseries ts = (Timeseries) lt;
-
-				Trace trace;
-				for (Iterator<Segment> var34 = ts.getSegments().iterator(); var34.hasNext(); lTraces.add(trace)) {
-					Segment s = (Segment) var34.next();
-					Metadata md = findMetaData(lmd, ts, s);
+			for (Timeseries ts : lts) {
+				for(Segment segment:ts.getSegments()){
+					Metadata md = findMetaData(lmd, ts, segment);
 					if (md == null) {
 						throw new Exception("Internal: Could not correlate metadata with waveform data");
 					}
 
 					usrMessage("Matching waveform to metadata: \n\t" + md);
-					trace = new Trace(md, s, ts.getDataQuality());
+					Trace trace = new Trace(md, segment, ts.getDataQuality());
 					if (includePolesZeros) {
-						SacpzCriteria spzc = new SacpzCriteria();
-						spzc.addNetwork(ts.getNetworkCode()).addChannel(ts.getChannelCode()).addLocation(ts.getLocation()).addStation(ts.getStationCode());
+						SacpzCriteria.SacpzCriteriaBuilder builder = SacpzCriteria.builder().netCode(ts.getNetworkCode()).chanCode(ts.getChannelCode()).
+								locCode(ts.getLocation()).staCode(ts.getStationCode());
 						ArrayList<Segment> segL = (ArrayList<Segment>) ts.getSegments();
-						Segment seg = (Segment) segL.get(0);
-						spzc.setStartTime(seg.getStartTime());
-						seg = (Segment) segL.get(segL.size() - 1);
-						spzc.setEndTime(seg.getEndTime());
-						List<Sacpz> l = spzs.fetch(spzc);
+						Segment seg = segL.get(0);
+						builder.startTime(seg.getStartTime());
+						seg = segL.get(segL.size() - 1);
+						builder.endTime(seg.getEndTime());
+						SacpzCriteria sacpzCriteria = builder.build();
+						List<Sacpz> l = spzs.fetch(sacpzCriteria);
 						if (l != null && l.size() > 0) {
 							if (l.size() > 1) {
-								throw new Exception("Problem interpreting SacPZ metedata for this time segment; multiple entries found!: " + spzc.toUrlParams());
+								throw new Exception("Problem interpreting SacPZ metadata for this time segment; multiple entries found!: " +
+										sacpzCriteria.toUrlParams());
 							}
-
-							trace.setSacpz((Sacpz) l.get(0));
+							trace.setSacpz(l.get(0));
 						}
 					}
+					lTraces.add(trace);
 				}
 			}
 		}
@@ -278,19 +285,19 @@ public class TraceData {
 		}
 	}
 
-	public static void setBASE_URL(String bASE_URL) {
-		BASE_URL = bASE_URL;
+	public static void setBaseUrl(String baseUrl) {
+		BASE_URL = baseUrl;
 	}
 
-	public static void setSACPZ_URL(String sACPZ_URL) {
-		SACPZ_URL = sACPZ_URL;
+	public static void setSacpzUrl(String sacpzUrl) {
+		SACPZ_URL = sacpzUrl;
 	}
 
-	public static void setSTATION_URL(String sTATION_URL) {
-		STATION_URL = sTATION_URL;
+	public static void setStationUrl(String stationUrl) {
+		STATION_URL = stationUrl;
 	}
 
-	public static void setWAVEFORM_URL(String wAVEFORM_URL) {
-		WAVEFORM_URL = wAVEFORM_URL;
+	public static void setWaveformUrl(String waveformUrl) {
+		WAVEFORM_URL = waveformUrl;
 	}
 }

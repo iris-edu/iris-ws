@@ -44,6 +44,12 @@ public class EventCriteria implements Criteria {
 
 	private Map<String, String> params = new HashMap<String, String>();
 
+	@Override
+	public Map<String, List<String>> toMapUrlParameters() {
+		Map<String, List<String>> map = new TreeMap<>();
+		return map;
+	}
+
 	public EventCriteria setStartTime(Date startTime) {
 		this.startTime = startTime;
 		return this;

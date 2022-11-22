@@ -18,18 +18,11 @@ public class TextParserTest {
 		StationService service = util.getStationService();
 
 		List<Network> networks;
-
-		StationCriteria c = new StationCriteria();
-		c.addNetwork("1B");
-		NetworkIterator it = service.iterateNetworks(c, OutputLevel.NETWORK);
-		while(it.hasNext()){
-			Network n=it.next();
-			System.out.println(n+"   "+n.getTotalNumberStations());
+		try(NetworkIterator it = service.iterateNetworks(StationCriteria.builder().netCode("1B").build(), OutputLevel.NETWORK);) {
+			while (it.hasNext()) {
+				Network n = it.next();
+				System.out.println(n + "   " + n.getTotalNumberStations());
+			}
 		}
-		it.close();
-
-		//networks = service.fetch("http://service.iris.edu/fdsnws/station/1/query?net=8X&sta=CA01A&level=sta");
-
-		//Network networkIn = networks.get(0);
 	}
 }

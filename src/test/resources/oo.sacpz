@@ -1,0 +1,26 @@
+* **********************************
+* NETWORK   (KNETWK): OO
+* STATION    (KSTNM): AXBA1
+* LOCATION   (KHOLE):
+* CHANNEL   (KCMPNM): HDH
+* CREATED           : 2022-11-03T14:06:50
+* START             : 2014-08-01T00:00:00
+* END               :
+* DESCRIPTION       : RSN Axial Base 1
+* LATITUDE          : 45.820179
+* LONGITUDE         : -129.736694
+* ELEVATION         : -2607.2
+* DEPTH             : 0.0
+* DIP               : 90.0
+* AZIMUTH           : 0.0
+* SAMPLE RATE       : 200.0
+* INPUT UNIT        : PASCAL
+* OUTPUT UNIT       : COUNTS
+* INSTTYPE          : HT1-90-U/Diff Hydrophone-DM-24 Mk3 Fixed Gain, g
+* INSTGAIN          : 1.820000e-03 (PA)
+* COMMENT           :
+* SENSITIVITY       : 2.257530e+03 (PA)
+* A0                : 1.000000e+00
+* **********************************
+ZEROS	0
+POLES	0

@@ -34,7 +34,6 @@ public class StationService extends BaseService {
 	}
 
 	private IterableStationParser getIterableParser(InputStream inputStream, Map<String, String> queryKeyValue, OutputLevel level) throws Exception {
-		try {
 			OutputFormat outputFormat = this.extractFormat(queryKeyValue);
 			if (outputFormat == OutputFormat.TEXT) {
 				if (OutputLevel.NETWORK == level) {
@@ -51,9 +50,6 @@ public class StationService extends BaseService {
 			} else {
 				throw new CriteriaException("Format: ['" + outputFormat.toString() + "'] is not supported");
 			}
-		} catch (CriteriaException var5) {
-			throw var5;
-		}
 	}
 
 	private StationParser getParser(InputStream inputStream, Map<String, String> queryKeyValue, OutputLevel level) throws CriteriaException, IOException {
@@ -69,8 +65,7 @@ public class StationService extends BaseService {
 
 	public NetworkIterator iterateNetworks(Criteria criteria, OutputLevel level) throws NoDataFoundException, CriteriaException, IOException, ServiceNotSupportedException {
 		((StationCriteria)criteria).setFormat(OutputFormat.TEXT);
-		StringBuilder paramsString = new StringBuilder((String)criteria.toUrlParams().get(0));
-		String urlString = this.baseUrl + "query?" + paramsString.toString() + "&level=network";
+		String urlString = this.baseUrl + "query?" + (String) criteria.toUrlParams().get(0) + "&level=network";
 		HttpURLConnection connection = null;
 		InputStream inputStream = null;
 		connection = this.getConnection(urlString);
@@ -161,8 +156,8 @@ public class StationService extends BaseService {
 
 		String uAgent;
 		int responseCode;
-		for(int i = 0; i < pairs.length; ++i) {
-			uAgent = pairs[i];
+		for (String pair : pairs) {
+			uAgent = pair;
 			responseCode = uAgent.indexOf(61);
 			queryKeyValue.put(URLDecoder.decode(uAgent.substring(0, responseCode), "UTF-8"), URLDecoder.decode(uAgent.substring(responseCode + 1), "UTF-8"));
 		}
@@ -263,8 +258,7 @@ public class StationService extends BaseService {
 		}
 
 		StationCriteria criteria = (StationCriteria)c;
-		StringBuilder paramsString = new StringBuilder((String)criteria.toUrlParams().get(0));
-		String theUrl = this.baseUrl + "query?" + paramsString.toString();
+		String theUrl = this.baseUrl + "query?" + (String) criteria.toUrlParams().get(0);
 		return this.fetch(theUrl);
 	}
 

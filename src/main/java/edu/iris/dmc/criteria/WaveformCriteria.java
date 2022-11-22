@@ -1,4 +1,3 @@
-
 package edu.iris.dmc.criteria;
 
 import java.io.UnsupportedEncodingException;
@@ -13,7 +12,18 @@ public class WaveformCriteria implements Criteria {
 	private boolean distinctRequests = false;
 	private Map<String, String> params = new HashMap<>();
 
-	public WaveformCriteria() {
+	public Map<String, List<String>> toMapUrlParameters(){
+		Map<String, List<String>> map = new TreeMap<>();
+		if (this.longestOnly != null) {
+			map.put("longestonly", Collections.singletonList(this.longestOnly ? "yes" : "no"));
+		}
+		if (this.minimumLength != null) {
+			map.put("minimumlength", Collections.singletonList(minimumLength.toString()));
+		}
+		if (this.quality != null) {
+			map.put("quality", Collections.singletonList(quality.name()));
+		}
+		return map;
 	}
 
 	public List<String> toUrlParams() throws CriteriaException, UnsupportedEncodingException {
@@ -21,19 +31,15 @@ public class WaveformCriteria implements Criteria {
 		if (this.longestOnly != null) {
 			stringBuilder.append("longestonly=").append(this.longestOnly).append("\n");
 		}
-
 		if (this.minimumLength != null) {
 			stringBuilder.append("minimumlength=").append(this.minimumLength).append("\n");
 		}
-
 		if (this.quality != null) {
 			stringBuilder.append("quality=").append(this.quality).append("\n");
 		}
-
 		String header = stringBuilder.toString();
 		List<String> postList = new ArrayList<>();
 		if (this.distinctRequests) {
-
 			for (String selection : this.selections) {
 				String buff = header +
 						selection;
@@ -43,19 +49,15 @@ public class WaveformCriteria implements Criteria {
 			StringBuilder buff = new StringBuilder();
 			buff.append(header);
 			boolean b = false;
-
 			for (String selection : this.selections) {
 				if (b) {
 					buff.append("\n");
 				}
-
 				b = true;
 				buff.append(selection);
 			}
-
 			postList.add(buff.toString());
 		}
-
 		return postList;
 	}
 

@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
 package edu.iris.dmc.service;
 
 import edu.iris.dmc.criteria.Criteria;
@@ -39,8 +34,7 @@ public class WaveformService extends BaseService {
 
 	private List<Timeseries> fetch(String baseUrl, String query, String username, String password) throws IOException, NoDataFoundException, CriteriaException, ServiceNotSupportedException, UnauthorizedAccessException {
 		HttpURLConnection connection = null;
-		InputStream inputStream = null;
-		ArrayList collection = new ArrayList();
+		List<Timeseries> collection = new ArrayList<>();
 
 		try {
 			connection = this.getConnection(baseUrl + "query", username, password);
@@ -64,94 +58,77 @@ public class WaveformService extends BaseService {
 			writer.close();
 			outputStream.close();
 			int responseCode = connection.getResponseCode();
-			inputStream = responseCode != 200 ? connection.getErrorStream() : connection.getInputStream();
-			label198:
-			switch(responseCode) {
-				case 200:
-					DataInputStream dis = new DataInputStream(inputStream);
-
-					while(true) {
-						try {
-							SeedRecord sr = SeedRecord.read(dis);
-							byte microseconds = 0;
-							if (sr instanceof DataRecord) {
-								DataRecord dr = (DataRecord)sr;
-								Blockette[] bs = dr.getBlockettes(1001);
-								if (bs.length > 0) {
-									Blockette1001 b1001 = (Blockette1001)bs[0];
-									microseconds = b1001.getMicrosecond();
-								}
-
-								if (dr.getBlockettes(1000).length != 0) {
-									DataHeader header = (DataHeader)dr.getControlHeader();
-									String network = header.getNetworkCode();
-									String station = header.getStationIdentifier();
-									String location = header.getLocationIdentifier();
-									String channel = header.getChannelIdentifier();
-									Timestamp startTime = Util.toTime(header.getStartBtime(), header.getActivityFlags(), header.getTimeCorrection(), microseconds);
-									Timeseries timeseries = new Timeseries(network, station, location, channel);
-									int index = collection.indexOf(timeseries);
-									if (index > -1) {
-										timeseries = (Timeseries)collection.get(index);
-									} else {
-										if (this.logger.isLoggable(Level.FINER)) {
-											this.logger.finer("Adding new Timeseries: " + timeseries);
-										}
-
-										collection.add(timeseries);
+			try(InputStream inputStream = responseCode != 200 ? connection.getErrorStream() : connection.getInputStream()){
+				label198:
+				switch (responseCode) {
+					case 200:
+						DataInputStream dis = new DataInputStream(inputStream);
+						while (true) {
+							try {
+								SeedRecord sr = SeedRecord.read(dis);
+								byte microseconds = 0;
+								if (sr instanceof DataRecord) {
+									DataRecord dr = (DataRecord) sr;
+									Blockette[] bs = dr.getBlockettes(1001);
+									if (bs.length > 0) {
+										Blockette1001 b1001 = (Blockette1001) bs[0];
+										microseconds = b1001.getMicrosecond();
 									}
 
-									timeseries.add(startTime, dr);
+									if (dr.getBlockettes(1000).length != 0) {
+										DataHeader header = (DataHeader) dr.getControlHeader();
+										String network = header.getNetworkCode();
+										String station = header.getStationIdentifier();
+										String location = header.getLocationIdentifier();
+										String channel = header.getChannelIdentifier();
+										Timestamp startTime = Util.toTime(header.getStartBtime(), header.getActivityFlags(), header.getTimeCorrection(), microseconds);
+										Timeseries timeseries = new Timeseries(network, station, location, channel);
+										int index = collection.indexOf(timeseries);
+										if (index > -1) {
+											timeseries = (Timeseries) collection.get(index);
+										} else {
+											if (this.logger.isLoggable(Level.FINER)) {
+												this.logger.finer("Adding new Timeseries: " + timeseries);
+											}
+
+											collection.add(timeseries);
+										}
+
+										timeseries.add(startTime, dr);
+									}
 								}
+							} catch (EOFException var37) {
+								dis.close();
+								break label198;
 							}
-						} catch (EOFException var37) {
-							dis.close();
-							break label198;
 						}
-					}
-				case 204:
-					throw new NoDataFoundException("(204) No data found for: " + query);
-				case 400:
-					throw new CriteriaException("Bad request parameter: " + StringUtil.toString(inputStream));
-				case 401:
-					throw new UnauthorizedAccessException("Unauthorized access: " + query);
-				case 404:
-					throw new NoDataFoundException("(404) No data found for: " + query);
-				case 429:
-					if (this.logger.isLoggable(Level.SEVERE)) {
-						this.logger.severe("Too Many Requests");
-					}
+					case 204:
+						throw new NoDataFoundException("(204) No data found for: " + query);
+					case 400:
+						throw new CriteriaException("Bad request parameter: " + StringUtil.toString(inputStream));
+					case 401:
+						throw new UnauthorizedAccessException("Unauthorized access: " + query);
+					case 404:
+						throw new NoDataFoundException("(404) No data found for: " + query);
+					case 429:
+						if (this.logger.isLoggable(Level.SEVERE)) {
+							this.logger.severe("Too Many Requests");
+						}
 
-					throw new IOException("Too Many Requests");
-				case 500:
-					if (this.logger.isLoggable(Level.WARNING)) {
-						this.logger.warning("An error occurred while making a GET request " + StringUtil.toString(inputStream));
-					}
+						throw new IOException("Too Many Requests");
+					case 500:
+						if (this.logger.isLoggable(Level.WARNING)) {
+							this.logger.warning("An error occurred while making a GET request " + StringUtil.toString(inputStream));
+						}
 
-					throw new IOException(StringUtil.toString(inputStream));
-				default:
-					throw new IOException(connection.getResponseMessage());
-			}
-		} catch (EOFException var38) {
-		} catch (SeedFormatException var39) {
-			throw new IOException(var39);
-		} catch (UnsupportedCompressionType var40) {
-			throw new IOException(var40);
-		} catch (CodecException var41) {
-			throw new IOException(var41);
-		} finally {
-			if (inputStream != null) {
-				try {
-					inputStream.close();
-				} catch (IOException var36) {
-					var36.printStackTrace();
+						throw new IOException(StringUtil.toString(inputStream));
+					default:
+						throw new IOException(connection.getResponseMessage());
 				}
 			}
-
-			if (connection != null) {
-				connection.disconnect();
-			}
-
+		} catch (EOFException ignored) {
+		} catch (SeedFormatException | CodecException e) {
+			throw new IOException(e);
 		}
 
 		if (this.logger.isLoggable(Level.FINER)) {
@@ -166,36 +143,27 @@ public class WaveformService extends BaseService {
 			this.logger.entering(this.getClass().getName(), "find(OutputStream out, Criteria criteria)", new Object[]{criteria});
 		}
 
-		ArrayList collection = new ArrayList();
+		List<Timeseries> collection = new ArrayList<>();
 
 		try {
 			List<String> paramsString = criteria.toUrlParams();
 			if (paramsString == null) {
 				throw new CriteriaException("No query parameters found!");
 			} else {
-				Iterator var6 = paramsString.iterator();
 
-				while(var6.hasNext()) {
-					String entry = (String)var6.next();
-
+				for (String entry : paramsString) {
 					try {
 						List<Timeseries> result = this.fetch(this.baseUrl, entry, username, password);
-						if (result != null) {
-							collection.addAll(result);
-						}
-					} catch (Exception var9) {
-						var9.printStackTrace();
-						if (var9 instanceof NoDataFoundException) {
+						collection.addAll(result);
+					} catch (Exception e) {
+						//this is for Matlab, not sure why
+						if (e instanceof NoDataFoundException) {
 							if (this.logger.isLoggable(Level.WARNING)) {
-								this.logger.finer(var9.getMessage());
+								this.logger.finer(e.getMessage());
 							}
 						} else {
-							if (!"Document not found on server".equals(var9.getMessage())) {
-								throw new IOException(var9);
-							}
-
-							if (this.logger.isLoggable(Level.WARNING)) {
-								this.logger.finer(var9.getMessage());
+							if (!"Document not found on server".equals(e.getMessage())) {
+								throw new IOException(e);
 							}
 						}
 					}
@@ -265,12 +233,9 @@ public class WaveformService extends BaseService {
 		if (this.logger.isLoggable(Level.FINER)) {
 			this.logger.entering(this.getClass().getName(), "find(OutputStream out, Criteria criteria)", new Object[]{query});
 		}
-
 		if (this.logger.isLoggable(Level.FINER)) {
 			this.logger.finer("Query url: " + query);
 		}
-
-		System.out.println(this.baseUrl + "query");
 		HttpURLConnection connection = null;
 		InputStream inputStream = null;
 

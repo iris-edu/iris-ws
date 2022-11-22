@@ -1,11 +1,18 @@
 package edu.iris.dmc.criteria;
 
 import edu.iris.dmc.ws.util.DateUtil;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.Singular;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
 
+@Builder
+@Getter
+@Setter
 public class StationCriteria implements Criteria {
 	private Date startBefore;
 	private Date startAfter;
@@ -14,10 +21,14 @@ public class StationCriteria implements Criteria {
 	private Date startTime;
 	private Date endTime;
 	private Date updatedAfter;
-	private String netCode;
-	private String staCode;
-	private String chanCode;
-	private String locCode;
+	@Singular
+	private List<String> netCodes;
+	@Singular
+	private List<String> staCodes;
+	@Singular
+	private List<String> chanCodes;
+	@Singular
+	private List<String>locCodes;
 	private Double minimumLatitude;
 	private Double maximumLatitude;
 	private Double minimumLongitude;
@@ -27,123 +38,36 @@ public class StationCriteria implements Criteria {
 	private Double minimumRadius;
 	private Double maximumRadius;
 	private OutputLevel level;
-	private OutputFormat format;
+	@Builder.Default
+	private OutputFormat format=OutputFormat.XML;
 	private boolean includeAvailability;
-	private boolean includeRestricted;
+	@Builder.Default
+	private boolean includeRestricted=true;
 	private boolean matchTimeSeries;
+	@Singular
 	private Map<String, String> params;
 
-	public StationCriteria() {
-		this.format = OutputFormat.XML;
-		this.includeAvailability = false;
-		this.includeRestricted = true;
-		this.matchTimeSeries = false;
-		this.params = new HashMap<>();
+	@Override
+	public Map<String, List<String>> toMapUrlParameters(){
+		Map<String, List<String>> map = new TreeMap<>();
+		map.put("format", Collections.singletonList(format.toString()));
+		map.put("includerestricted", Collections.singletonList(includeRestricted?"yes":"no"));
+		map.put("matchtimeSeries", Collections.singletonList(matchTimeSeries ?"yes":"no"));
+		map.put("includeavailability", Collections.singletonList(includeAvailability ?"yes":"no"));
+		if(this.netCodes!=null&&!this.netCodes.isEmpty()) {
+			map.put("network", this.netCodes);
+		}
+		if(this.staCodes!=null&&!this.staCodes.isEmpty()) {
+			map.put("station", this.staCodes);
+		}
+		if(this.chanCodes!=null&&!this.chanCodes.isEmpty()) {
+			map.put("channel", this.chanCodes);
+		}
+		if(this.locCodes!=null&&!this.locCodes.isEmpty()) {
+			map.put("location", this.locCodes);
+		}
+		return map;
 	}
-
-	public StationCriteria setMinimumLatitude(Double minimumLatitude) {
-		this.minimumLatitude = minimumLatitude;
-		return this;
-	}
-
-	public StationCriteria setMaximumLatitude(Double maximumLatitude) {
-		this.maximumLatitude = maximumLatitude;
-		return this;
-	}
-
-	public StationCriteria setMinimumLongitude(Double minimumLongitude) {
-		this.minimumLongitude = minimumLongitude;
-		return this;
-	}
-
-	public StationCriteria setMaximumLongitude(Double maximumLongitude) {
-		this.maximumLongitude = maximumLongitude;
-		return this;
-	}
-
-	public StationCriteria setUpdatedAfter(Date updatedAfter) {
-		this.updatedAfter = updatedAfter;
-		return this;
-	}
-
-	public StationCriteria setLatitude(Double latitude) {
-		this.latitude = latitude;
-		return this;
-	}
-
-	public StationCriteria setLongitude(Double longitude) {
-		this.longitude = longitude;
-		return this;
-	}
-
-	public StationCriteria setMinimumRadius(Double minimumRadius) {
-		this.minimumRadius = minimumRadius;
-		return this;
-	}
-
-	public StationCriteria setMaximumRadius(Double maximumRadius) {
-		this.maximumRadius = maximumRadius;
-		return this;
-	}
-
-	public StationCriteria setStartTime(Date start) {
-		this.startTime = start;
-		return this;
-	}
-
-	public StationCriteria setEndTime(Date end) {
-		this.endTime = end;
-		return this;
-	}
-
-	public Date getStartTime() {
-		return this.startTime;
-	}
-
-	public Date getEndTime() {
-		return this.endTime;
-	}
-
-	public boolean isIncludeAvailability() {
-		return this.includeAvailability;
-	}
-
-	public void setIncludeAvailability(boolean includeAvailability) {
-		this.includeAvailability = includeAvailability;
-	}
-
-	public boolean isIncludeRestricted() {
-		return this.includeRestricted;
-	}
-
-	public void setIncludeRestricted(boolean includeRestricted) {
-		this.includeRestricted = includeRestricted;
-	}
-
-	public boolean isMatchTimeSeries() {
-		return this.matchTimeSeries;
-	}
-
-	public void setMatchTimeSeries(boolean matchTimeSeries) {
-		this.matchTimeSeries = matchTimeSeries;
-	}
-
-	public OutputLevel getLevel() {
-		return this.level;
-	}
-
-	public void setLevel(OutputLevel level) {
-		this.level = level;
-	}
-
-	public OutputFormat getFormat() {
-		return this.format;
-	}
-
-	public void setFormat(OutputFormat format) {
-		this.format = format;
-	}
-
 	public List<String> toUrlParams(OutputLevel level) throws CriteriaException {
 		this.level = level;
 		return this.toUrlParams();
@@ -152,35 +76,35 @@ public class StationCriteria implements Criteria {
 	public List<String> toUrlParams() throws CriteriaException {
 		StringBuilder string = new StringBuilder();
 		boolean and = false;
-		if (this.netCode != null) {
-			string.append("net=").append(this.netCode);
+		if (this.netCodes != null && !this.netCodes.isEmpty()) {
+			string.append("net=").append(String.join(",", this.netCodes));
 			and = true;
 		}
 
-		if (this.staCode != null) {
+		if (this.staCodes != null&&!this.staCodes.isEmpty()) {
 			if (and) {
 				string.append("&");
 			}
 
-			string.append("sta=").append(this.staCode);
+			string.append("sta=").append(String.join(",", this.staCodes));
 			and = true;
 		}
 
-		if (this.chanCode != null) {
+		if (this.chanCodes != null&&!this.chanCodes.isEmpty()) {
 			if (and) {
 				string.append("&");
 			}
 
-			string.append("cha=").append(this.chanCode);
+			string.append("cha=").append(String.join(",",this.chanCodes));
 			and = true;
 		}
 
-		if (this.locCode != null) {
+		if (this.locCodes != null&&!this.locCodes.isEmpty()) {
 			if (and) {
 				string.append("&");
 			}
 
-			string.append("loc=").append(this.locCode);
+			string.append("loc=").append(String.join(",",this.locCodes));
 			and = true;
 		}
 
@@ -301,7 +225,7 @@ public class StationCriteria implements Criteria {
 				string.append("&");
 			}
 
-			string.append("maxlatitude=" + this.maximumLatitude);
+			string.append("maxlatitude=").append(this.maximumLatitude);
 			and = true;
 		}
 
@@ -355,11 +279,11 @@ public class StationCriteria implements Criteria {
 				string.append("&");
 			}
 
-			string.append("level=" + this.level.toString());
+			string.append("level=").append(this.level.toString());
 			and = true;
 		}
 
-		if (!this.params.isEmpty()) {
+		if (this.params!=null&&!this.params.isEmpty()) {
 			for(Iterator<Entry<String, String>> var4 = this.params.entrySet().iterator(); var4.hasNext(); and = true) {
 				Entry<String, String> entry = var4.next();
 				if (and) {
@@ -380,69 +304,6 @@ public class StationCriteria implements Criteria {
 		return l;
 	}
 
-	public StationCriteria addStation(String staCode) {
-		if (this.staCode == null) {
-			this.staCode = staCode;
-		} else {
-			this.staCode = this.staCode + "," + staCode;
-		}
-
-		return this;
-	}
-
-	public StationCriteria addNetwork(String netCode) {
-		if (this.netCode == null) {
-			this.netCode = netCode;
-		} else {
-			this.netCode = this.netCode + "," + netCode;
-		}
-
-		return this;
-	}
-
-	public StationCriteria addChannel(String channel) {
-		if (this.chanCode == null) {
-			this.chanCode = channel;
-		} else {
-			this.chanCode = this.chanCode + "," + channel;
-		}
-
-		return this;
-	}
-
-	public StationCriteria addLocation(String location) {
-		if (location != null) {
-			location = location.replace(" ", "-");
-		}
-
-		if (this.locCode == null) {
-			this.locCode = location;
-		} else {
-			this.locCode = this.locCode + "," + location;
-		}
-
-		return this;
-	}
-
-	public StationCriteria setEndBefore(Date date) {
-		this.endBefore = date;
-		return this;
-	}
-
-	public StationCriteria setEndAfter(Date date) {
-		this.endAfter = date;
-		return this;
-	}
-
-	public StationCriteria setStartBefore(Date date) {
-		this.startBefore = date;
-		return this;
-	}
-
-	public StationCriteria setStartAfter(Date date) {
-		this.startAfter = date;
-		return this;
-	}
 
 	public void add(String key, String value) {
 		this.params.put(key, value);
@@ -456,10 +317,10 @@ public class StationCriteria implements Criteria {
 		this.startTime = null;
 		this.endTime = null;
 		this.updatedAfter = null;
-		this.netCode = null;
-		this.staCode = null;
-		this.chanCode = null;
-		this.locCode = null;
+		this.netCodes = null;
+		this.staCodes = null;
+		this.chanCodes = null;
+		this.locCodes = null;
 		this.minimumLatitude = null;
 		this.maximumLatitude = null;
 		this.minimumLongitude = null;
@@ -471,45 +332,5 @@ public class StationCriteria implements Criteria {
 		this.level = OutputLevel.STATION;
 		this.format = OutputFormat.XML;
 		this.params.clear();
-	}
-
-	public Date getStartBefore() {
-		return this.startBefore;
-	}
-
-	public Date getStartAfter() {
-		return this.startAfter;
-	}
-
-	public Date getEndBefore() {
-		return this.endBefore;
-	}
-
-	public Date getEndAfter() {
-		return this.endAfter;
-	}
-
-	public Date getUpdatedAfter() {
-		return this.updatedAfter;
-	}
-
-	public String[] getNetworks() {
-		return this.netCode == null ? null : this.netCode.split(",");
-	}
-
-	public String[] getStations() {
-		return this.staCode == null ? null : this.staCode.split(",");
-	}
-
-	public String[] getChannels() {
-		return this.chanCode == null ? null : this.chanCode.split(",");
-	}
-
-	public String[] getLocations() {
-		return this.locCode == null ? null : this.locCode.replace("-", " ").split(",");
-	}
-
-	public String toString() {
-		return "StationCriteria [startBefore=" + this.startBefore + ", startAfter=" + this.startAfter + ", endBefore=" + this.endBefore + ", endAfter=" + this.endAfter + ", startTime=" + this.startTime + ", endTime=" + this.endTime + ", updatedAfter=" + this.updatedAfter + ", netCode=" + this.netCode + ", staCode=" + this.staCode + ", chanCode=" + this.chanCode + ", locCode=" + this.locCode + ", minimumLatitude=" + this.minimumLatitude + ", maximumLatitude=" + this.maximumLatitude + ", minimumLongitude=" + this.minimumLongitude + ", maximumLongitude=" + this.maximumLongitude + ", latitude=" + this.latitude + ", longitude=" + this.longitude + ", minimumRadius=" + this.minimumRadius + ", maximumRadius=" + this.maximumRadius + ", includeAvailability=" + this.includeAvailability + ", includeRestricted=" + this.includeRestricted + ", matchTimeSeries=" + this.matchTimeSeries + "]";
 	}
 }
