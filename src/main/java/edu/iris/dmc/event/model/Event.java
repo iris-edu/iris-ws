@@ -1,17 +1,16 @@
 package edu.iris.dmc.event.model;
 
+import edu.iris.quake.model.EventDescription;
+import edu.iris.quake.model.EventDescriptionType;
+import edu.iris.quake.model.EventType;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
-
-import edu.iris.quake.model.EventDescription;
-import edu.iris.quake.model.EventDescriptionType;
-import edu.iris.quake.model.EventType;
 
 /**
  * This class represents an Event, users can access events related origins and

@@ -1,8 +1,6 @@
 package edu.iris.dmc.criteria;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +16,7 @@ public interface Criteria {
 	public List<String> toUrlParams() throws CriteriaException,
 			UnsupportedEncodingException;
 
+	public Map<String, List<String>> toMapUrlParameters();
 	/**
 	 * Will reset the criteria to its defaults
 	 */

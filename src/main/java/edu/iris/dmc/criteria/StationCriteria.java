@@ -1,213 +1,73 @@
 package edu.iris.dmc.criteria;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
-
 import edu.iris.dmc.ws.util.DateUtil;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.Singular;
 
-/**
- * StationCriteria is a simple criteria builder to retrieve networks
- * 
- */
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Map.Entry;
+
+@Builder
+@Getter
+@Setter
 public class StationCriteria implements Criteria {
-
 	private Date startBefore;
 	private Date startAfter;
 	private Date endBefore;
 	private Date endAfter;
-
-	// protected Date[] timeWindow;
-
 	private Date startTime;
 	private Date endTime;
-
 	private Date updatedAfter;
-
-	private String netCode;
-	private String staCode;
-	private String chanCode;
-	private String locCode;
-
+	@Singular
+	private List<String> netCodes;
+	@Singular
+	private List<String> staCodes;
+	@Singular
+	private List<String> chanCodes;
+	@Singular
+	private List<String>locCodes;
 	private Double minimumLatitude;
 	private Double maximumLatitude;
 	private Double minimumLongitude;
 	private Double maximumLongitude;
-
 	private Double latitude;
 	private Double longitude;
 	private Double minimumRadius;
 	private Double maximumRadius;
-
 	private OutputLevel level;
-	private OutputFormat format = OutputFormat.XML;
+	@Builder.Default
+	private OutputFormat format=OutputFormat.XML;
+	private boolean includeAvailability;
+	@Builder.Default
+	private boolean includeRestricted=true;
+	private boolean matchTimeSeries;
+	@Singular
+	private Map<String, String> params;
 
-	private boolean includeAvailability = false;
-	private boolean includeRestricted = true;
-	private boolean matchTimeSeries = false;
-	private Map<String, String> params = new HashMap<String, String>();
-
-	/**
-	 * Set minimum latitude in degrees
-	 * 
-	 * @param minimumLatitude
-	 * @return
-	 */
-	public StationCriteria setMinimumLatitude(Double minimumLatitude) {
-		this.minimumLatitude = minimumLatitude;
-		return this;
+	@Override
+	public Map<String, List<String>> toMapUrlParameters(){
+		Map<String, List<String>> map = new TreeMap<>();
+		map.put("format", Collections.singletonList(format.toString()));
+		map.put("includerestricted", Collections.singletonList(includeRestricted?"yes":"no"));
+		map.put("matchtimeSeries", Collections.singletonList(matchTimeSeries ?"yes":"no"));
+		map.put("includeavailability", Collections.singletonList(includeAvailability ?"yes":"no"));
+		if(this.netCodes!=null&&!this.netCodes.isEmpty()) {
+			map.put("network", this.netCodes);
+		}
+		if(this.staCodes!=null&&!this.staCodes.isEmpty()) {
+			map.put("station", this.staCodes);
+		}
+		if(this.chanCodes!=null&&!this.chanCodes.isEmpty()) {
+			map.put("channel", this.chanCodes);
+		}
+		if(this.locCodes!=null&&!this.locCodes.isEmpty()) {
+			map.put("location", this.locCodes);
+		}
+		return map;
 	}
-
-	/**
-	 * Set maximum latitude in degrees
-	 * 
-	 * @param maximumLatitude
-	 * @return
-	 */
-	public StationCriteria setMaximumLatitude(Double maximumLatitude) {
-		this.maximumLatitude = maximumLatitude;
-		return this;
-	}
-
-	/**
-	 * Set minimum longitude in degrees
-	 * 
-	 * @param miniumumLonitude
-	 * @return
-	 */
-	public StationCriteria setMinimumLongitude(Double minimumLongitude) {
-		this.minimumLongitude = minimumLongitude;
-		return this;
-	}
-
-	/**
-	 * Set maximum longitude in degrees
-	 * 
-	 * @param maximumLongitude
-	 * @return
-	 */
-	public StationCriteria setMaximumLongitude(Double maximumLongitude) {
-		this.maximumLongitude = maximumLongitude;
-		return this;
-	}
-
-	/**
-	 * Set when were stations last updated
-	 * 
-	 * @param updatedAfter
-	 * @return
-	 */
-	public StationCriteria setUpdatedAfter(Date updatedAfter) {
-		this.updatedAfter = updatedAfter;
-		return this;
-	}
-
-	/**
-	 * Set latitude in degrees, used in combination with radius
-	 * 
-	 * @param latitude
-	 * @return
-	 */
-	public StationCriteria setLatitude(Double latitude) {
-		this.latitude = latitude;
-		return this;
-	}
-
-	/**
-	 * Set longitude in degrees, used in combination with radius
-	 * 
-	 * @param longitude
-	 * @return
-	 */
-	public StationCriteria setLongitude(Double longitude) {
-		this.longitude = longitude;
-		return this;
-	}
-
-	/**
-	 * Set the minimum radius in degrees
-	 * 
-	 * @param minumumRadius
-	 * @return
-	 */
-	public StationCriteria setMinimumRadius(Double minimumRadius) {
-		this.minimumRadius = minimumRadius;
-		return this;
-	}
-
-	/**
-	 * Set the maximum radius in degrees
-	 * 
-	 * @param maximumRadius
-	 * @return
-	 */
-	public StationCriteria setMaximumRadius(Double maximumRadius) {
-		this.maximumRadius = maximumRadius;
-		return this;
-	}
-
-	public StationCriteria setStartTime(Date start) {
-		this.startTime = start;
-		return this;
-	}
-
-	public StationCriteria setEndTime(Date end) {
-		this.endTime = end;
-		return this;
-	}
-
-	public Date getStartTime() {
-		return startTime;
-	}
-
-	public Date getEndTime() {
-		return endTime;
-	}
-
-	public boolean isIncludeAvailability() {
-		return includeAvailability;
-	}
-
-	public void setIncludeAvailability(boolean includeAvailability) {
-		this.includeAvailability = includeAvailability;
-	}
-
-	public boolean isIncludeRestricted() {
-		return includeRestricted;
-	}
-
-	public void setIncludeRestricted(boolean includeRestricted) {
-		this.includeRestricted = includeRestricted;
-	}
-
-	public boolean isMatchTimeSeries() {
-		return matchTimeSeries;
-	}
-
-	public void setMatchTimeSeries(boolean matchTimeSeries) {
-		this.matchTimeSeries = matchTimeSeries;
-	}
-
-	public OutputLevel getLevel() {
-		return level;
-	}
-
-	public void setLevel(OutputLevel level) {
-		this.level = level;
-	}
-
-	public OutputFormat getFormat() {
-		return format;
-	}
-
-	public void setFormat(OutputFormat format) {
-		this.format = format;
-	}
-
 	public List<String> toUrlParams(OutputLevel level) throws CriteriaException {
 		this.level = level;
 		return this.toUrlParams();
@@ -216,64 +76,66 @@ public class StationCriteria implements Criteria {
 	public List<String> toUrlParams() throws CriteriaException {
 		StringBuilder string = new StringBuilder();
 		boolean and = false;
-		if (this.netCode != null) {
-			string.append("net=" + this.netCode);
-			and = true;
-		}
-		if (this.staCode != null) {
-			if (and) {
-				string.append("&");
-			}
-			string.append("sta=" + this.staCode);
+		if (this.netCodes != null && !this.netCodes.isEmpty()) {
+			string.append("net=").append(String.join(",", this.netCodes));
 			and = true;
 		}
 
-		if (this.chanCode != null) {
+		if (this.staCodes != null&&!this.staCodes.isEmpty()) {
 			if (and) {
 				string.append("&");
 			}
-			string.append("cha=" + this.chanCode);
+
+			string.append("sta=").append(String.join(",", this.staCodes));
 			and = true;
 		}
 
-		if (this.locCode != null) {
+		if (this.chanCodes != null&&!this.chanCodes.isEmpty()) {
 			if (and) {
 				string.append("&");
 			}
-			string.append("loc=" + this.locCode);
+
+			string.append("cha=").append(String.join(",",this.chanCodes));
+			and = true;
+		}
+
+		if (this.locCodes != null&&!this.locCodes.isEmpty()) {
+			if (and) {
+				string.append("&");
+			}
+
+			string.append("loc=").append(String.join(",",this.locCodes));
 			and = true;
 		}
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-
 		if (this.updatedAfter != null) {
 			if (and) {
 				string.append("&");
 			}
-			string.append("updatedafter=")
-					.append(sdf.format(this.updatedAfter));
+
+			string.append("updatedafter=").append(sdf.format(this.updatedAfter));
 			and = true;
 		}
 
 		if (this.startTime != null) {
-
 			if (and) {
 				string.append("&");
 			}
+
 			string.append("starttime=");
 			string.append(DateUtil.format(this.startTime));
 			and = true;
 		}
 
 		if (this.endTime != null) {
-
 			if (and) {
 				string.append("&");
 			}
+
 			string.append("endtime=");
 			string.append(DateUtil.format(this.endTime));
-
 			and = true;
 		}
 
@@ -281,7 +143,8 @@ public class StationCriteria implements Criteria {
 			if (and) {
 				string.append("&");
 			}
-			string.append("endbefore=" + DateUtil.format(this.endBefore));
+
+			string.append("endbefore=").append(DateUtil.format(this.endBefore));
 			and = true;
 		}
 
@@ -289,7 +152,8 @@ public class StationCriteria implements Criteria {
 			if (and) {
 				string.append("&");
 			}
-			string.append("endafter=" + DateUtil.format(this.endAfter));
+
+			string.append("endafter=").append(DateUtil.format(this.endAfter));
 			and = true;
 		}
 
@@ -297,7 +161,8 @@ public class StationCriteria implements Criteria {
 			if (and) {
 				string.append("&");
 			}
-			string.append("startbefore=" + DateUtil.format(this.startBefore));
+
+			string.append("startbefore=").append(DateUtil.format(this.startBefore));
 			and = true;
 		}
 
@@ -305,69 +170,79 @@ public class StationCriteria implements Criteria {
 			if (and) {
 				string.append("&");
 			}
-			string.append("startafter=" + DateUtil.format(this.startAfter));
+
+			string.append("startafter=").append(DateUtil.format(this.startAfter));
 			and = true;
 		}
 
-		if (maximumRadius != null) {
+		if (this.maximumRadius != null) {
 			if (and) {
 				string.append("&");
 			}
-			string.append("maxradius=" + this.maximumRadius);
+
+			string.append("maxradius=").append(this.maximumRadius);
 			and = true;
 		}
 
-		if (minimumRadius != null) {
+		if (this.minimumRadius != null) {
 			if (and) {
 				string.append("&");
 			}
-			string.append("minradius=" + this.minimumRadius);
+
+			string.append("minradius=").append(this.minimumRadius);
 			and = true;
 		}
 
-		if (latitude != null) {
+		if (this.latitude != null) {
 			if (and) {
 				string.append("&");
 			}
-			string.append("latitude=" + this.latitude);
-			and = true;
-		}
-		if (longitude != null) {
-			if (and) {
-				string.append("&");
-			}
-			string.append("longitude=" + this.longitude);
+
+			string.append("latitude=").append(this.latitude);
 			and = true;
 		}
 
-		if (minimumLatitude != null) {
+		if (this.longitude != null) {
 			if (and) {
 				string.append("&");
 			}
-			string.append("minlatitude=" + this.minimumLatitude);
+
+			string.append("longitude=").append(this.longitude);
 			and = true;
 		}
 
-		if (maximumLatitude != null) {
+		if (this.minimumLatitude != null) {
 			if (and) {
 				string.append("&");
 			}
-			string.append("maxlatitude=" + this.maximumLatitude);
+
+			string.append("minlatitude=").append(this.minimumLatitude);
 			and = true;
 		}
 
-		if (minimumLongitude != null) {
+		if (this.maximumLatitude != null) {
 			if (and) {
 				string.append("&");
 			}
-			string.append("minlongitude=" + this.minimumLongitude);
+
+			string.append("maxlatitude=").append(this.maximumLatitude);
 			and = true;
 		}
 
-		if (maximumLongitude != null) {
+		if (this.minimumLongitude != null) {
 			if (and) {
 				string.append("&");
 			}
+
+			string.append("minlongitude=").append(this.minimumLongitude);
+			and = true;
+		}
+
+		if (this.maximumLongitude != null) {
+			if (and) {
+				string.append("&");
+			}
+
 			string.append("maxlongitude=" + this.maximumLongitude);
 			and = true;
 		}
@@ -376,6 +251,7 @@ public class StationCriteria implements Criteria {
 			if (and) {
 				string.append("&");
 			}
+
 			string.append("includeavailability=true");
 			and = true;
 		}
@@ -384,13 +260,16 @@ public class StationCriteria implements Criteria {
 			if (and) {
 				string.append("&");
 			}
+
 			string.append("includerestricted=false");
 			and = true;
 		}
+
 		if (this.matchTimeSeries) {
 			if (and) {
 				string.append("&");
 			}
+
 			string.append("matchtimeseries=true");
 			and = true;
 		}
@@ -399,135 +278,36 @@ public class StationCriteria implements Criteria {
 			if (and) {
 				string.append("&");
 			}
-			string.append("level=" + this.level.toString());
+
+			string.append("level=").append(this.level.toString());
 			and = true;
 		}
 
-		if (!this.params.isEmpty()) {
-			for (Map.Entry<String, String> entry : params.entrySet()) {
+		if (this.params!=null&&!this.params.isEmpty()) {
+			for(Iterator<Entry<String, String>> var4 = this.params.entrySet().iterator(); var4.hasNext(); and = true) {
+				Entry<String, String> entry = var4.next();
 				if (and) {
 					string.append("&");
 				}
-				string.append(entry.getKey() + "=" + entry.getValue());
-				and = true;
+
+				string.append((String) entry.getKey()).append("=").append((String) entry.getValue());
 			}
 		}
+
 		if (and) {
 			string.append("&");
 		}
-		string.append("format=" + this.format.toString());
-		List<String> l = new ArrayList<String>();
+
+		string.append("format=").append(this.format.toString());
+		List<String> l = new ArrayList<>();
 		l.add(string.toString());
 		return l;
 	}
 
-	/**
-	 * Add station restriction to constrain the result. Wild card (* ?)
-	 * accepted. This method can be chained.
-	 * 
-	 * @param staCode
-	 * @return
-	 */
-	public StationCriteria addStation(String staCode) {
-		if (this.staCode == null) {
-			this.staCode = staCode;
-		} else {
-			this.staCode = new StringBuilder(this.staCode)
-					.append("," + staCode).toString();
-		}
 
-		return this;
-	}
-
-	/**
-	 * Add network restriction to constrain the result. Wild card (* ?)
-	 * accepted. This method can be chained.
-	 * 
-	 * @param netCode
-	 * @return
-	 */
-	public StationCriteria addNetwork(String netCode) {
-		if (this.netCode == null) {
-			this.netCode = netCode;
-		} else {
-			this.netCode = new StringBuilder(this.netCode)
-					.append("," + netCode).toString();
-		}
-		return this;
-	}
-
-	/**
-	 * Add channel restriction to constrain the result. Wild card (* ?)
-	 * accepted. This method can be chained.
-	 * 
-	 * @param channel
-	 * @return
-	 */
-	public StationCriteria addChannel(String channel) {
-		if (this.chanCode == null) {
-			this.chanCode = channel;
-		} else {
-			this.chanCode = new StringBuilder(this.chanCode).append(
-					"," + channel).toString();
-		}
-		return this;
-	}
-
-	/**
-	 * Add location restriction to constrain the result. Wild card (* ?)
-	 * accepted. This method can be chained.
-	 * 
-	 * @param location
-	 * @return criteria
-	 */
-	public StationCriteria addLocation(String location) {
-		if (location != null) {
-			location = location.replace(" ", "-");
-		}
-		if (this.locCode == null) {
-			this.locCode = location;
-		} else {
-			this.locCode = new StringBuilder(this.locCode).append(
-					"," + location).toString();
-		}
-		return this;
-	}
-
-	public StationCriteria setEndBefore(Date date) {
-		this.endBefore = date;
-		return this;
-	}
-
-	public StationCriteria setEndAfter(Date date) {
-		this.endAfter = date;
-		return this;
-	}
-
-	public StationCriteria setStartBefore(Date date) {
-		this.startBefore = date;
-		return this;
-	}
-
-	public StationCriteria setStartAfter(Date date) {
-		this.startAfter = date;
-		return this;
-	}
-
-	/**
-	 * Introduce new key/value parameters
-	 * 
-	 * @param key
-	 * @param value
-	 * @return the criteria
-	 */
 	public void add(String key, String value) {
-		params.put(key, value);
+		this.params.put(key, value);
 	}
-
-	/**
-	 * Will reset the criteria object to its defaults clearing all other
-	 * properties.
-	 */
 
 	public void reset() {
 		this.startBefore = null;
@@ -537,10 +317,10 @@ public class StationCriteria implements Criteria {
 		this.startTime = null;
 		this.endTime = null;
 		this.updatedAfter = null;
-		this.netCode = null;
-		this.staCode = null;
-		this.chanCode = null;
-		this.locCode = null;
+		this.netCodes = null;
+		this.staCodes = null;
+		this.chanCodes = null;
+		this.locCodes = null;
 		this.minimumLatitude = null;
 		this.maximumLatitude = null;
 		this.minimumLongitude = null;
@@ -553,84 +333,4 @@ public class StationCriteria implements Criteria {
 		this.format = OutputFormat.XML;
 		this.params.clear();
 	}
-
-	public Date getStartBefore() {
-		return startBefore;
-	}
-
-	public Date getStartAfter() {
-		return startAfter;
-	}
-
-	public Date getEndBefore() {
-		return endBefore;
-	}
-
-	public Date getEndAfter() {
-		return endAfter;
-	}
-
-	public Date getUpdatedAfter() {
-		return updatedAfter;
-	}
-
-	public String[] getNetworks() {
-		if (this.netCode == null) {
-			return null;
-		}
-		return netCode.split(",");
-	}
-
-	public String[] getStations() {
-		if (this.staCode == null) {
-			return null;
-		}
-		return staCode.split(",");
-	}
-
-	public String[] getChannels() {
-		if (this.chanCode == null) {
-			return null;
-		}
-		return chanCode.split(",");
-	}
-
-	public String[] getLocations() {
-		if (this.locCode == null) {
-			return null;
-		}
-		return locCode.replace("-", " ").split(",");
-	}
-
-	@Override
-	public String toString() {
-		return "StationCriteria [startBefore=" + startBefore + ", startAfter="
-				+ startAfter + ", endBefore=" + endBefore + ", endAfter="
-				+ endAfter + ", startTime=" + startTime + ", endTime="
-				+ endTime + ", updatedAfter=" + updatedAfter + ", netCode="
-				+ netCode + ", staCode=" + staCode + ", chanCode=" + chanCode
-				+ ", locCode=" + locCode + ", minimumLatitude="
-				+ minimumLatitude + ", maximumLatitude=" + maximumLatitude
-				+ ", minimumLongitude=" + minimumLongitude
-				+ ", maximumLongitude=" + maximumLongitude + ", latitude="
-				+ latitude + ", longitude=" + longitude + ", minimumRadius="
-				+ minimumRadius + ", maximumRadius=" + maximumRadius
-				+ ", includeAvailability=" + includeAvailability
-				+ ", includeRestricted=" + includeRestricted
-				+ ", matchTimeSeries=" + matchTimeSeries + "]";
-	}
-
-	/*
-	 * @Override public String toString() { return
-	 * "StationCriteria [startBefore=" + startBefore + ", startAfter=" +
-	 * startAfter + ", endBefore=" + endBefore + ", endAfter=" + endAfter +
-	 * ", startTime=" + startTime + ", endTime=" + endTime + ", updatedAfter=" +
-	 * updatedAfter + ", netCode=" + netCode + ", staCode=" + staCode +
-	 * ", chanCode=" + chanCode + ", locCode=" + locCode + ", minLat=" +
-	 * minimumLatitude + ", maxLat=" + maximumLatitude + ", minLon=" +
-	 * minimumLongitude + ", maxLon=" + maximumLongitude + ", lat=" + latitude +
-	 * ", lon=" + longitude + ", minRadius=" + minimumRadius + ", maxRadius=" +
-	 * maximumRadius + "]"; }
-	 */
-
 }

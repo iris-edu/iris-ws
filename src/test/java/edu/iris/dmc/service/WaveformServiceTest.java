@@ -1,6 +1,12 @@
 package edu.iris.dmc.service;
 
 
+import edu.iris.dmc.criteria.WaveformCriteria;
+import edu.iris.dmc.timeseries.model.Timeseries;
+import edu.iris.dmc.ws.util.DateUtil;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -12,14 +18,6 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
-
-import org.junit.Before;
-import org.junit.Test;
-
-import edu.iris.dmc.criteria.WaveformCriteria;
-import edu.iris.dmc.service.ServiceUtil;
-import edu.iris.dmc.service.WaveformService;
-import edu.iris.dmc.timeseries.model.Timeseries;
 
 public class WaveformServiceTest {
 	WaveformService waveFormService;
@@ -56,12 +54,13 @@ public class WaveformServiceTest {
 		Date a = dfm.parse(startDateStr);
 
 		Date b = dfm.parse(endDateStr);
+
 		try {
 			waveFormService.setAuth("nobody@iris.edu", "anonymous");
 
 			// IU ANMO 00 BHZ 2010-084T00:00:00 2010-091T00:00:00
 			WaveformCriteria criteria = new WaveformCriteria();
-			criteria.add(network, station, location, channel, a, b)
+			criteria.add(network, station, location, channel, DateUtil.parseAny(startDateStr), DateUtil.parseAny(endDateStr))
 					.makeDistinctRequests(true);
 
 			List<Timeseries> timeSeriesCollection = waveFormService
@@ -92,7 +91,7 @@ public class WaveformServiceTest {
 
 			// IU ANMO 00 BHZ 2010-084T00:00:00 2010-091T00:00:00
 			WaveformCriteria criteria = new WaveformCriteria();
-			criteria.add(network, station, location, channel, a, b)
+			criteria.add(network, station, location, channel, DateUtil.parseAny(startDateStr), DateUtil.parseAny(endDateStr))
 					.makeDistinctRequests(true);
 
 			List<Timeseries> timeSeriesCollection = waveFormService.fetch(

@@ -1,28 +1,19 @@
 package edu.iris.dmc.extensions.entities;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import edu.iris.dmc.fdsn.station.model.Channel;
 import edu.iris.dmc.fdsn.station.model.Network;
 import edu.iris.dmc.fdsn.station.model.Sensitivity;
 import edu.iris.dmc.fdsn.station.model.Station;
 
-/**
- * A class in which to store relevant meta data (channel epochs to be exact)
- * returned by the Station web service. This data can be used with the waveform
- * service to ensure that requested data segments don't span channel epochs.
- * Also used in the population of the Trace elements once the waveform data is
- * acquired.
- * 
- */
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
 public class Metadata {
-
 	static final DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-
 	protected String network;
 	protected String station;
 	protected String location;
@@ -42,232 +33,224 @@ public class Metadata {
 	protected String sensUnits;
 	protected Character quality;
 
-	// ACCESSORS
+	public Metadata() {
+	}
 
 	public String getNetwork() {
-		return network;
+		return this.network;
 	}
 
 	public void setNetwork(String s) {
-		network = s;
+		this.network = s;
 	}
 
 	public String getStation() {
-		return station;
+		return this.station;
 	}
 
 	public void setStation(String s) {
-		station = s;
+		this.station = s;
 	}
 
 	public String getLocation() {
-		return location;
+		return this.location;
 	}
 
 	public void setLocation(String s) {
-		location = s;
+		this.location = s;
 	}
 
 	public String getChannel() {
-		return channel;
+		return this.channel;
 	}
 
 	public void setChannel(String s) {
-		channel = s;
+		this.channel = s;
 	}
 
 	public Date getStartDate() {
-		return startDate;
+		return this.startDate;
 	}
 
 	public void setStartDate(Date t) {
-		startDate = t;
+		this.startDate = t;
 	}
 
 	public Date getEndDate() {
-		return endDate;
+		return this.endDate;
 	}
 
 	public void setEndDate(Date t) {
-		endDate = t;
+		this.endDate = t;
 	}
 
 	public double getLat() {
-		return lat;
+		return this.lat;
 	}
 
 	public void setLat(double d) {
-		lat = d;
+		this.lat = d;
 	}
 
 	public double getLon() {
-		return lon;
+		return this.lon;
 	}
 
 	public void setLon(double d) {
-		lon = d;
+		this.lon = d;
 	}
 
 	public double getElev() {
-		return elev;
+		return this.elev;
 	}
 
 	public void setElev(double d) {
-		elev = d;
+		this.elev = d;
 	}
 
 	public double getDepth() {
-		return depth;
+		return this.depth;
 	}
 
 	public void setDepth(double d) {
-		depth = d;
+		this.depth = d;
 	}
 
 	public double getAzimuth() {
-		return azimuth;
+		return this.azimuth;
 	}
 
 	public void setAzimuth(double d) {
-		azimuth = d;
+		this.azimuth = d;
 	}
 
 	public double getDip() {
-		return dip;
+		return this.dip;
 	}
 
 	public void setDip(double d) {
-		dip = d;
+		this.dip = d;
 	}
 
 	public String getInstrument() {
-		return instrument;
+		return this.instrument;
 	}
 
 	public void setInstrument(String s) {
-		instrument = s;
+		this.instrument = s;
 	}
 
 	public double getSampleRate() {
-		return sampleRate;
+		return this.sampleRate;
 	}
 
 	public void setSampleRate(double d) {
-		sampleRate = d;
+		this.sampleRate = d;
 	}
 
 	public double getSensitivity() {
-		return sensitivity;
+		return this.sensitivity;
 	}
 
 	public void setSensitivity(double d) {
-		sensitivity = d;
+		this.sensitivity = d;
 	}
 
 	public double getSensFreq() {
-		return sensFreq;
+		return this.sensFreq;
 	}
 
 	public void setSensFreq(double d) {
-		sensFreq = d;
+		this.sensFreq = d;
 	}
 
 	public Character getQuality() {
-		return quality;
+		return this.quality;
 	}
 
 	public void setQuality(Character c) {
-		quality = c;
+		this.quality = c;
 	}
 
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
-
-		sb.append(network + "," + station + "," + location + "," + channel
-				+ ",");
-		sb.append(lat + "," + lon + "," + elev + "," + depth + "," + azimuth
-				+ "," + dip + ",");
-
-		sb.append(instrument + "," + sensitivity + "," + sensFreq + ","
-				+ sensUnits + "," + sampleRate);
-
-		if (startDate != null) {
-			sb.append("," + sdf.format(startDate));
+		sb.append(this.network).append(",").append(this.station).append(",").append(this.location).append(",").append(this.channel).append(",");
+		sb.append(this.lat).append(",").append(this.lon).append(",").append(this.elev).append(",").append(this.depth).append(",").append(this.azimuth).append(",").append(this.dip).append(",");
+		sb.append(this.instrument).append(",").append(this.sensitivity).append(",").append(this.sensFreq).append(",").append(this.sensUnits).append(",").append(this.sampleRate);
+		if (this.startDate != null) {
+			sb.append(",").append(sdf.format(this.startDate));
 		}
 
-		if (endDate != null) {
-			sb.append("," + sdf.format(endDate));
+		if (this.endDate != null) {
+			sb.append(",").append(sdf.format(this.endDate));
 		}
+
 		sb.append("\n");
-
 		return sb.toString();
 	}
 
-	/**
-	 * Parses the returned network objects from the station service into a
-	 * simple list of Metadata objects.
-	 * 
-	 * @param networks
-	 * @return List<Metadata>
-	 */
 	public static List<Metadata> parseMetadata(List<Network> networks) {
-		if (networks == null)
+		if (networks == null) {
 			return null;
+		} else {
+			List<Metadata> lmd = new ArrayList<>();
 
-		List<Metadata> lmd = new ArrayList<Metadata>();
+			for (Network n : networks) {
+				for (Station s : n.getStations()) {
+					String network = n.getCode();
+					String station = s.getCode();
 
-		for (Network n : networks) {
-			for (Station s : n.getStations()) {
-				String network = n.getCode();
-				String station = s.getCode();
-				for (Channel c : s.getChannels()) {
-
-					Metadata md = new Metadata();
-					md.network = network.trim();
-					md.station = station.trim();
-
-					String location = c.getLocationCode();
-					if ((location == null) || (location.trim().equals("")))
-						location = "--";
-					md.location = location.trim();
-					md.channel = c.getCode().trim();
-
-					md.lat = c.getLatitudeValue();
-					md.lon = c.getLongitudeValue();
-					md.elev = c.getElevationValue();
-					md.depth = c.getDepthValue();
-					md.azimuth = c.getAzimuthValue();
-					md.dip = c.getDipValue();// + 90.f;
-
-					md.instrument = c.getSensor().getType();
-
-					Sensitivity sens = c.getResponse()
-							.getInstrumentSensitivity();
-					if (sens != null) {
-						if (sens.getValue() != null) {
-							md.sensitivity = sens.getValue();
+					Metadata md;
+					for (Iterator<Channel> it = s.getChannels().iterator(); it.hasNext(); lmd.add(md)) {
+						Channel c = (Channel) it.next();
+						md = new Metadata();
+						md.network = network.trim();
+						md.station = station.trim();
+						String location = c.getLocationCode();
+						if (location == null || location.trim().equals("")) {
+							location = "--";
 						}
-						if (sens.getFrequency() != null) {
-							md.sensFreq = sens.getFrequency();
+
+						md.location = location.trim();
+						md.channel = c.getCode().trim();
+						md.lat = c.getLatitude() == null ? 0 : c.getLatitude().getValue();
+						md.lon = c.getLongitude() == null ? 0 : c.getLongitude().getValue();
+						md.elev = c.getElevation() == null ? 0 : c.getElevation().getValue();
+						md.depth = c.getDepth() == null ? 0 : c.getDepth().getValue();
+						md.azimuth = c.getAzimuth() == null ? 0 : c.getAzimuth().getValue();
+						md.dip = c.getDip() == null ? 0 : c.getDip().getValue();
+						md.instrument = c.getSensor() == null ? null : c.getSensor().getType();
+						Sensitivity sens = c.getResponse() == null ? null : c.getResponse().getInstrumentSensitivity();
+						if (sens != null) {
+							if (sens.getValue() != null) {
+								md.sensitivity = sens.getValue();
+							}
+
+							if (sens.getFrequency() != null) {
+								md.sensFreq = sens.getFrequency();
+							}
+
+							if (sens.getInputUnits() != null) {
+								md.sensUnits = sens.getInputUnits().getName();
+							}
+
+							if (c.getSampleRateValue() != null) {
+								md.sampleRate = c.getSampleRateValue();
+							}
 						}
-						if (sens.getInputUnits() != null) {
-							md.sensUnits = sens.getInputUnits().getName();
+
+						if (c.getStartDate() != null) {
+							md.startDate = c.getStartDate();
 						}
-						if (c.getSampleRateValue() != null) {
-							md.sampleRate = c.getSampleRateValue();
+
+						if (c.getEndDate() != null) {
+							md.endDate = c.getEndDate();
 						}
 					}
-
-					if (c.getStartDate() != null) {
-						md.startDate = c.getStartDate();
-					}
-					if (c.getEndDate() != null) {
-						md.endDate = c.getEndDate();
-					}
-					lmd.add(md);
 				}
 			}
+
+			return lmd;
 		}
-		return lmd;
 	}
 }

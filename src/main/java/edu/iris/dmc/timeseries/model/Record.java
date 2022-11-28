@@ -1,10 +1,7 @@
 package edu.iris.dmc.timeseries.model;
 
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
-
-import edu.sc.seis.seisFile.mseed.Btime;
 
 public class Record {
 	private Timestamp startTime;
@@ -14,27 +11,24 @@ public class Record {
 	private int[] location;
 	private Timestamp expectedNextSampleTime;
 
-	public Record(Timestamp startTime, Timestamp endTime, float sampleRate,
-			int numberOfSamples, int[] location) {
-		super();
+	public Record(Timestamp startTime, Timestamp endTime, float sampleRate, int numberOfSamples, int[] location) {
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.sampleRate = sampleRate;
 		this.numberOfSamples = numberOfSamples;
 		this.location = location;
-		
 		Calendar cal = Calendar.getInstance();
 		cal = Calendar.getInstance();
-		cal.setTimeInMillis(startTime.getTime() + Double.doubleToLongBits(sampleRate/(numberOfSamples)));
+		cal.setTimeInMillis(startTime.getTime() + Double.doubleToLongBits((double)(sampleRate / (float)numberOfSamples)));
 		this.expectedNextSampleTime = new Timestamp(cal.getTime().getTime());
 	}
 
 	public Timestamp getExpectedNextSampleTime() {
-		return expectedNextSampleTime;
+		return this.expectedNextSampleTime;
 	}
 
 	public Timestamp getStartTime() {
-		return startTime;
+		return this.startTime;
 	}
 
 	public void setStartTime(Timestamp startTime) {
@@ -42,7 +36,7 @@ public class Record {
 	}
 
 	public Timestamp getEndTime() {
-		return endTime;
+		return this.endTime;
 	}
 
 	public void setEndTime(Timestamp endTime) {
@@ -50,7 +44,7 @@ public class Record {
 	}
 
 	public int[] getLocation() {
-		return location;
+		return this.location;
 	}
 
 	public void setLocation(int[] location) {
@@ -58,7 +52,7 @@ public class Record {
 	}
 
 	public float getSampleRate() {
-		return sampleRate;
+		return this.sampleRate;
 	}
 
 	public void setSampleRate(float sampleRate) {
@@ -66,11 +60,10 @@ public class Record {
 	}
 
 	public int getNumberOfSamples() {
-		return numberOfSamples;
+		return this.numberOfSamples;
 	}
 
 	public void setNumberOfSamples(int numberOfSamples) {
 		this.numberOfSamples = numberOfSamples;
 	}
-
 }

@@ -1,11 +1,9 @@
 package edu.iris.dmc.event.model;
 
+import edu.iris.quake.model.Quakeml;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.bind.annotation.XmlRootElement;
-
-import edu.iris.quake.model.Quakeml;
 
 public class Message extends Quakeml {
 

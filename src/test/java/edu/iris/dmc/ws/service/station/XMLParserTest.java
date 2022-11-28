@@ -1,22 +1,18 @@
 package edu.iris.dmc.ws.service.station;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
-
-import org.junit.Test;
-
 import edu.iris.dmc.criteria.CriteriaException;
-import edu.iris.dmc.criteria.OutputLevel;
-import edu.iris.dmc.criteria.StationCriteria;
 import edu.iris.dmc.fdsn.station.model.Network;
 import edu.iris.dmc.fdsn.station.model.Station;
-import edu.iris.dmc.service.NetworkIterator;
 import edu.iris.dmc.service.NoDataFoundException;
 import edu.iris.dmc.service.ServiceNotSupportedException;
 import edu.iris.dmc.service.ServiceUtil;
 import edu.iris.dmc.service.StationService;
+import org.junit.Test;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.List;
 
 public class XMLParserTest {
 

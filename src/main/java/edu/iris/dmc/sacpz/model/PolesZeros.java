@@ -4,16 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PolesZeros {
+	private List<Pole> poles = new ArrayList<>();
+	private List<Zero> zeros = new ArrayList<>();
 
-	private List<Pole> poles = new ArrayList<Pole>();
-	private List<Zero> zeros = new ArrayList<Zero>();
+	public PolesZeros() {
+	}
 
 	public List<Pole> getPoles() {
-		return poles;
+		return this.poles;
 	}
 
 	public List<Zero> getZeros() {
-		return zeros;
+		return this.zeros;
 	}
 
 	public void setPoles(List<Pole> poles) {
@@ -23,5 +25,5 @@ public class PolesZeros {
 	public void setZeros(List<Zero> zeros) {
 		this.zeros = zeros;
 	}
-
 }
+

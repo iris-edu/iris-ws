@@ -1,16 +1,11 @@
 package edu.iris.dmc.service.station.parser;
 
+import edu.iris.dmc.criteria.OutputLevel;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-
-import edu.iris.dmc.criteria.CriteriaException;
-import edu.iris.dmc.criteria.OutputLevel;
-import edu.iris.dmc.fdsn.station.model.Station;
 
 public abstract class AbstractStationParser implements StationParser {
-
 	protected InputStream inputStream;
 	private boolean isClosed = false;
 	protected OutputLevel level;
@@ -20,20 +15,19 @@ public abstract class AbstractStationParser implements StationParser {
 		this.level = level;
 	}
 
-
 	public boolean isClosed() {
-		return isClosed;
+		return this.isClosed;
 	}
-	//@Override
+
 	public void close() throws IOException {
-		isClosed = true;
-		if (inputStream != null) {
+		this.isClosed = true;
+		if (this.inputStream != null) {
 			try {
-				inputStream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
+				this.inputStream.close();
+			} catch (IOException var2) {
+				var2.printStackTrace();
 			}
 		}
-	}
 
+	}
 }

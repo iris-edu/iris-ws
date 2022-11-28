@@ -1,19 +1,18 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
+
 package edu.iris.dmc.service.station.parser;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigInteger;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
+import edu.iris.dmc.criteria.OutputLevel;
+import edu.iris.dmc.fdsn.station.model.*;
+import edu.iris.dmc.ws.util.DateUtil;
+import org.xml.sax.helpers.XMLFilterImpl;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.stream.EventFilter;
@@ -23,16 +22,14 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Iterator;
 
-import edu.iris.dmc.criteria.OutputLevel;
-import edu.iris.dmc.fdsn.station.model.FDSNStationXML;
-import edu.iris.dmc.fdsn.station.model.Network;
-import edu.iris.dmc.fdsn.station.model.RestrictedStatusType;
-import edu.iris.dmc.fdsn.station.model.Station;
-import org.xml.sax.helpers.XMLFilterImpl;
-
-public class StationXMLIteratorParser extends XMLFilterImpl implements
-		IterableStationParser {
+public class StationXMLIteratorParser extends XMLFilterImpl implements IterableStationParser {
 	private XMLEventReader xmlEventFilteredReader;
 	private XMLEventReader xmlEventReader;
 	private Unmarshaller unmarshaller;
@@ -41,279 +38,211 @@ public class StationXMLIteratorParser extends XMLFilterImpl implements
 	private FDSNStationXML root;
 	private boolean closed = false;
 
-	public StationXMLIteratorParser(InputStream inputStream, OutputLevel level) {
+	public StationXMLIteratorParser(InputStream inputStream, OutputLevel level) throws Exception {
 		XMLInputFactory xmlFactory = XMLInputFactory.newInstance();
-		try {
-			xmlEventReader = xmlFactory.createXMLEventReader(inputStream);
 
+		try {
+			this.xmlEventReader = xmlFactory.createXMLEventReader(inputStream);
 			EventFilter filter = new EventFilter() {
 				public boolean accept(XMLEvent event) {
 					if (event.isStartElement()) {
 						return true;
-					}
-					if (event.isCharacters()) {
+					} else if (!event.isCharacters()) {
+						return false;
+					} else {
 						String s = event.asCharacters().getData();
-						// System.out.println("[" + s + "]");
-						if (s == null) {
-							return false;
-						}
-						if (s.trim().equals("\n")) {
-							return false;
-						}
-						return true;
+						return s == null || s.trim().equals("\n");
 					}
-					return false;
 				}
 			};
-
-			JAXBContext jc = JAXBContext
-					.newInstance(edu.iris.dmc.fdsn.station.model.ObjectFactory.class);
-			unmarshaller = jc.createUnmarshaller();
-
-			xmlEventFilteredReader = xmlFactory.createFilteredReader(
-					xmlEventReader, filter);
-		} catch (XMLStreamException e) {
-			System.err
-					.println("StationXMLIterableParser: Unable to iterate lines, printing stack trace");
-			e.printStackTrace();
-		} catch (JAXBException e) {
-			System.err
-					.println("StationXMLIterableParser: Unable to iterate xml, printing stack trace");
-			e.printStackTrace();
+			JAXBContext jc = JAXBContext.newInstance(new Class[]{ObjectFactory.class});
+			this.unmarshaller = jc.createUnmarshaller();
+			this.xmlEventFilteredReader = xmlFactory.createFilteredReader(this.xmlEventReader, filter);
+		} catch (Exception var6) {
+			throw new Exception("StationXMLIterableParser: Unable to iterate xml, printing stack trace", var6);
 		}
 	}
 
 	public Station next() {
 		try {
 			XMLEvent e = null;
-			while ((e = xmlEventFilteredReader.peek()) != null) {
-				if (e.isStartElement()) {
-					StartElement se = (StartElement) e;
+
+			while((e = this.xmlEventFilteredReader.peek()) != null) {
+				if (!e.isStartElement()) {
+					this.xmlEventFilteredReader.next();
+				} else {
+					StartElement se = (StartElement)e;
 					if (se.getName().getLocalPart().equals("FDSNStationXML")) {
-						root = new FDSNStationXML();
-						// we only peeked, get the actual one
-						se = (StartElement) xmlEventFilteredReader.nextEvent();
-						// Maybe parse attributes...
-						while ((e = xmlEventFilteredReader.peek()) != null) {
+						this.root = new FDSNStationXML();
+						this.xmlEventFilteredReader.nextEvent();
+
+						while((e = this.xmlEventFilteredReader.peek()) != null) {
 							if (e.isStartElement()) {
-								se = (StartElement) e;
-								if (se.getName().getLocalPart()
-										.equals("Source")) {
-									e = xmlEventFilteredReader.nextEvent();
-									e = xmlEventFilteredReader.peek();
+								se = (StartElement)e;
+								if (se.getName().getLocalPart().equals("Source")) {
+									e = this.xmlEventFilteredReader.nextEvent();
+									e = this.xmlEventFilteredReader.peek();
 									if (e != null && e.isCharacters()) {
-										e = xmlEventFilteredReader.nextEvent();
-										root.setSource(e.asCharacters()
-												.getData());
+										e = this.xmlEventFilteredReader.nextEvent();
+										this.root.setSource(e.asCharacters().getData());
 									}
-								} else if (se.getName().getLocalPart()
-										.equals("Sender")) {
-									e = xmlEventFilteredReader.nextEvent();
-									e = xmlEventFilteredReader.peek();
+								} else if (se.getName().getLocalPart().equals("Sender")) {
+									e = this.xmlEventFilteredReader.nextEvent();
+									e = this.xmlEventFilteredReader.peek();
 									if (e != null && e.isCharacters()) {
-										e = xmlEventFilteredReader.nextEvent();
-										root.setSender(e.asCharacters()
-												.getData());
+										e = this.xmlEventFilteredReader.nextEvent();
+										this.root.setSender(e.asCharacters().getData());
 									}
-								} else if (se.getName().getLocalPart()
-										.equals("Module")) {
-									e = xmlEventFilteredReader.nextEvent();
-									e = xmlEventFilteredReader.peek();
+								} else if (se.getName().getLocalPart().equals("Module")) {
+									e = this.xmlEventFilteredReader.nextEvent();
+									e = this.xmlEventFilteredReader.peek();
 									if (e != null && e.isCharacters()) {
-										e = xmlEventFilteredReader.nextEvent();
-										root.setModule(e.asCharacters()
-												.getData());
+										e = this.xmlEventFilteredReader.nextEvent();
+										this.root.setModule(e.asCharacters().getData());
 									}
-								} else if (se.getName().getLocalPart()
-										.equals("ModuleURI")) {
-									e = xmlEventFilteredReader.nextEvent();
-									e = xmlEventFilteredReader.peek();
+								} else if (se.getName().getLocalPart().equals("ModuleURI")) {
+									e = this.xmlEventFilteredReader.nextEvent();
+									e = this.xmlEventFilteredReader.peek();
 									if (e != null && e.isCharacters()) {
-										e = xmlEventFilteredReader.nextEvent();
-										root.setModuleURI(e.asCharacters()
-												.getData());
+										e = this.xmlEventFilteredReader.nextEvent();
+										this.root.setModuleURI(e.asCharacters().getData());
+									}
+								} else {
+									if (!se.getName().getLocalPart().equals("Created")) {
+										break;
 									}
 
-								} else if (se.getName().getLocalPart()
-										.equals("Created")) {
-									e = xmlEventFilteredReader.nextEvent();
-									e = xmlEventFilteredReader.peek();
+									e = this.xmlEventFilteredReader.nextEvent();
+									e = this.xmlEventFilteredReader.peek();
 									if (e != null && e.isCharacters()) {
-										e = xmlEventFilteredReader.nextEvent();
-										XMLGregorianCalendar created;
-										try {
-											created = DatatypeFactory
-													.newInstance()
-													.newXMLGregorianCalendar(
-															e.asCharacters()
-																	.getData());
-											root.setCreated(created);
-										} catch (DatatypeConfigurationException e1) {
-											// TODO Auto-generated catch
-											// block
-											e1.printStackTrace();
+										e = this.xmlEventFilteredReader.nextEvent();
+										XMLGregorianCalendar created = DatatypeFactory.newInstance().newXMLGregorianCalendar(e.asCharacters().getData());
+										this.root.setCreated(created);
+									}
+								}
+							} else {
+								this.xmlEventFilteredReader.nextEvent();
+							}
+						}
+					} else if (!se.getName().getLocalPart().equals("Network")) {
+						if (se.getName().getLocalPart().equals("Description")) {
+							this.xmlEventFilteredReader.nextEvent();
+							this.network.setDescription(this.xmlEventFilteredReader.getElementText());
+						} else {
+							String tnos;
+							if (se.getName().getLocalPart().equals("TotalNumberStations")) {
+								this.xmlEventFilteredReader.nextEvent();
+								tnos = this.xmlEventFilteredReader.getElementText();
+								if (tnos != null) {
+									this.network.setTotalNumberStations(new BigInteger(tnos));
+								}
+							} else if (se.getName().getLocalPart().equals("SelectedNumberStations")) {
+								this.xmlEventFilteredReader.nextEvent();
+								tnos = this.xmlEventFilteredReader.getElementText();
+								if (tnos != null) {
+									this.network.setSelectedNumberStations(new BigInteger(tnos));
+								}
+							} else if (se.getName().getLocalPart().equals("Station")) {
+								Object o = this.unmarshaller.unmarshal(this.xmlEventReader, Station.class);
+								if (o instanceof JAXBElement) {
+									Object jo = ((JAXBElement)o).getValue();
+									if (jo instanceof Station) {
+										if (this.station != null) {
+											Station oldStation = this.station;
+											this.station = (Station)jo;
+											this.network.addStation(this.station);
+											return oldStation;
 										}
+
+										this.station = (Station)jo;
+										this.network.addStation(this.station);
 									}
-								} else {
-									break;
 								}
 							} else {
-								xmlEventFilteredReader.nextEvent();
-							}
-						}// END WHILE FOR ROOT
-					} else if (se.getName().getLocalPart().equals("Network")) {
-						network = new Network();
-						network.setRootDocument(root);
-						Iterator<Attribute> attributes = se.getAttributes();
-						while (attributes.hasNext()) {
-							Attribute attribute = attributes.next();
-							String attributeName = attribute.getName()
-									.getLocalPart();
-							if (attributeName.equals("code")) {
-								network.setCode(attribute.getValue());
-							} else if (attributeName.equals("startDate")) {
-								String startString = attribute.getValue();
-								if (startString != null) {
-									SimpleDateFormat sdf = new SimpleDateFormat(
-											"yyyy-MM-dd'T'HH:mm:ss");
-									try {
-										Date date = sdf.parse(startString);
-										network.setStartDate(date);
-									} catch (ParseException e1) {
-										// TODO Auto-generated catch block
-										e1.printStackTrace();
-									}
-								}
-							} else if (attributeName.equals("endDate")) {
-								String endString = attribute.getValue();
-								if (endString != null) {
-									SimpleDateFormat sdf = new SimpleDateFormat(
-											"yyyy-MM-dd'T'HH:mm:ss");
-									try {
-										Date date = sdf.parse(endString);
-										GregorianCalendar c = new GregorianCalendar();
-										c.setTime(date);
-										XMLGregorianCalendar cal2 = DatatypeFactory
-												.newInstance()
-												.newXMLGregorianCalendar(c);
-										network.setEndDate(date);
-									} catch (ParseException e1) {
-										// TODO Auto-generated catch block
-										e1.printStackTrace();
-									} catch (DatatypeConfigurationException e2) {
-										// TODO Auto-generated catch block
-										e2.printStackTrace();
-									}
-								}
-							} else if (attributeName.equals("restrictedStatus")) {
-								network.setRestrictedStatus(RestrictedStatusType
-										.fromValue(attribute.getValue()));
-							} else {
-								// Do nothing for now
-							}
-						}
-						xmlEventFilteredReader.next();
-					} else if (se.getName().getLocalPart()
-							.equals("Description")) {
-						xmlEventFilteredReader.nextEvent();
-						network.setDescription(xmlEventFilteredReader
-								.getElementText());
-
-					} else if (se.getName().getLocalPart()
-							.equals("TotalNumberStations")) {
-						xmlEventFilteredReader.nextEvent();
-						String tnos = xmlEventFilteredReader.getElementText();
-						if (tnos != null) {
-							network.setTotalNumberStations(new BigInteger(tnos));
-						}
-
-					} else if (se.getName().getLocalPart()
-							.equals("SelectedNumberStations")) {
-						xmlEventFilteredReader.nextEvent();
-						String tnos = xmlEventFilteredReader.getElementText();
-						if (tnos != null) {
-							network.setSelectedNumberStations(new BigInteger(
-									tnos));
-						}
-
-					} else if (se.getName().getLocalPart().equals("Station")) {
-						Object o = unmarshaller.unmarshal(xmlEventReader,
-								edu.iris.dmc.fdsn.station.model.Station.class);
-
-						if (o instanceof javax.xml.bind.JAXBElement) {
-							Object jo = ((JAXBElement) o).getValue();
-							if (jo instanceof edu.iris.dmc.fdsn.station.model.Station) {
-								if (station == null) {
-									station = (edu.iris.dmc.fdsn.station.model.Station) jo;
-									network.addStation(station);
-								} else {
-									Station oldStation = station;
-									station = (edu.iris.dmc.fdsn.station.model.Station) jo;
-									network.addStation(station);
-									return oldStation;
-								}
+								this.xmlEventFilteredReader.next();
 							}
 						}
 					} else {
-						xmlEventFilteredReader.next();
+						this.network = new Network();
+						this.network.setRootDocument(this.root);
+						Iterator attributes = se.getAttributes();
+
+						while(attributes.hasNext()) {
+							Attribute attribute = (Attribute)attributes.next();
+							String attributeName = attribute.getName().getLocalPart();
+							if (attributeName.equals("code")) {
+								this.network.setCode(attribute.getValue());
+							} else {
+								String endString;
+								Date date;
+								if (attributeName.equals("startDate")) {
+									endString = attribute.getValue();
+									if (endString != null) {
+										date = DateUtil.parseAny(endString);
+										this.network.setStartDate(date);
+									}
+								} else if (attributeName.equals("endDate")) {
+									endString = attribute.getValue();
+									if (endString != null) {
+										date = DateUtil.parseAny(endString);
+										GregorianCalendar c = new GregorianCalendar();
+										c.setTime(date);
+										this.network.setEndDate(date);
+									}
+								} else if (attributeName.equals("restrictedStatus")) {
+									this.network.setRestrictedStatus(RestrictedStatusType.fromValue(attribute.getValue()));
+								}
+							}
+						}
+
+						this.xmlEventFilteredReader.next();
 					}
-				} else {
-					xmlEventFilteredReader.next();
 				}
 			}
-		} catch (XMLStreamException e) {
-			System.err
-					.println("StationXMLIterableParser: Unable to iterate lines, printing stack trace");
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		} catch (JAXBException e) {
-			System.err
-					.println("StationXMLIterableParser: Unable to iterate lines, printing stack trace");
-			e.printStackTrace();
-			throw new RuntimeException(e);
+		} catch (Exception var9) {
+			throw new RuntimeException("StationXMLIterableParser: Unable to iterate lines, printing stack trace", var9);
 		}
-		if (station != null) {
-			Station oldStation = station;
-			station = null;
-			network.addStation(oldStation);
+
+		if (this.station != null) {
+			Station oldStation = this.station;
+			this.station = null;
+			this.network.addStation(oldStation);
 			return oldStation;
+		} else {
+			return this.station;
 		}
-		return station;
 	}
 
-	//@Override
 	public boolean hasNext() {
-		if (closed) {
+		if (this.closed) {
 			return false;
-		}
-		boolean hasNext = this.xmlEventReader.hasNext();
-		if (!hasNext) {
-			try {
-				this.close();
-			} catch (IOException e) {
-				e.printStackTrace();
+		} else {
+			boolean hasNext = this.xmlEventReader.hasNext();
+			if (!hasNext) {
+				try {
+					this.close();
+				} catch (IOException var3) {
+					var3.printStackTrace();
+				}
 			}
-		}
-		return hasNext;
 
+			return hasNext;
+		}
 	}
 
-	//@Override
 	public void remove() {
 		throw new UnsupportedOperationException();
 	}
 
-	//@Override
 	public void close() throws IOException {
 		if (this.xmlEventReader != null) {
 			try {
 				this.xmlEventReader.close();
-				closed = true;
-			} catch (XMLStreamException e) {
-				throw new IOException(e);
+				this.closed = true;
+			} catch (XMLStreamException var2) {
+				throw new IOException(var2);
 			}
 		}
 
 	}
-
 }

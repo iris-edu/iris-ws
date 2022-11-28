@@ -1,12 +1,7 @@
 package edu.iris.dmc.criteria;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * EventCriteria is a simple criteria builder to retrieve events
@@ -48,6 +43,12 @@ public class EventCriteria implements Criteria {
 	private EventOrder orderBy;
 
 	private Map<String, String> params = new HashMap<String, String>();
+
+	@Override
+	public Map<String, List<String>> toMapUrlParameters() {
+		Map<String, List<String>> map = new TreeMap<>();
+		return map;
+	}
 
 	public EventCriteria setStartTime(Date startTime) {
 		this.startTime = startTime;
