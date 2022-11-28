@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Singular;
+import org.apache.http.client.utils.URIUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -103,8 +104,7 @@ public class StationCriteria implements Criteria {
 			if (and) {
 				string.append("&");
 			}
-
-			string.append("loc=").append(String.join(",",this.locCodes));
+			string.append("loc=").append(String.join(",",this.locCodes).replace(' ','-'));
 			and = true;
 		}
 
@@ -243,7 +243,7 @@ public class StationCriteria implements Criteria {
 				string.append("&");
 			}
 
-			string.append("maxlongitude=" + this.maximumLongitude);
+			string.append("maxlongitude=").append(this.maximumLongitude);
 			and = true;
 		}
 

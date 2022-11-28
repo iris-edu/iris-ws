@@ -258,7 +258,7 @@ public class StationService extends BaseService {
 		}
 
 		StationCriteria criteria = (StationCriteria)c;
-		String theUrl = this.baseUrl + "query?" + (String) criteria.toUrlParams().get(0);
+		String theUrl = this.baseUrl + "query?" + criteria.toUrlParams().get(0);
 		return this.fetch(theUrl);
 	}
 
@@ -276,12 +276,10 @@ public class StationService extends BaseService {
 		if (logger.isLoggable(Level.FINER)) {
 			logger.entering(this.getClass().getName(), "fetch(String url)", new Object[]{url});
 		}
-
 		URL u = new URL(url);
 		String query = u.getQuery();
 		String[] pairs = query.split("&");
 		Map<String, String> queryKeyValue = new LinkedHashMap<>();
-
 
 		String pair;
 		for (String s : pairs) {
@@ -292,7 +290,6 @@ public class StationService extends BaseService {
 				queryKeyValue.put(URLDecoder.decode(pair.substring(0, idx), "UTF-8"), URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
 			}
 		}
-
 		OutputLevel level = this.extractLevel(queryKeyValue);
 		StationParser parser = null;
 		List<Network> result = null;
