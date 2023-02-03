@@ -18,10 +18,10 @@ public class TraceDataTest {
 	public void fetchIU() throws Exception {
 		Trace[] traces = TraceData.fetchTraces("IU", "ANMO", "00", "BHZ", "2010-01-01 00:00:00.000",
 				"2010-01-01 01:00:00.000", 'M', false, null, null);
-		
-		for(Trace trace:traces) {
+
+		for (Trace trace : traces) {
 			System.out.println(trace);
-			assertEquals(72000,trace.getSampleCount());
+			assertEquals(72000, trace.getSampleCount());
 		}
 	}
 
@@ -30,20 +30,20 @@ public class TraceDataTest {
 		Trace[] traces = TraceData.fetchTraces("IU", "ANMO", "00", "BHZ", "2010-01-01 00:00:00.000",
 				"2010-01-01 01:00:00.000", false, null, null);
 
-		for(Trace trace:traces) {
+		for (Trace trace : traces) {
 			System.out.println(trace);
-			assertEquals(72000,trace.getSampleCount());
+			assertEquals(72000, trace.getSampleCount());
 		}
 	}
-	
+
 	@Test
 	public void fetchAuthIU() throws Exception {
 		Trace[] traces = TraceData.fetchTraces("IU", "ANMO", "00", "BHZ", "2010-01-01 00:00:00.000",
 				"2010-01-01 01:00:00.000", 'M', true, "nobody@iris.edu", "anonymous");
-		
-		for(Trace trace:traces) {
+
+		for (Trace trace : traces) {
 			System.out.println(trace);
-			assertEquals(72000,trace.getSampleCount());
+			assertEquals(72000, trace.getSampleCount());
 		}
 	}
 
@@ -57,9 +57,9 @@ public class TraceDataTest {
 				"2010-01-01 01:00:00.000", 'M', false, null, null);
 
 
-		for(Trace trace:traces) {
+		for (Trace trace : traces) {
 			System.out.println(trace);
-			assertEquals(72000,trace.getSampleCount());
+			assertEquals(72000, trace.getSampleCount());
 		}
 	}
 
@@ -68,20 +68,20 @@ public class TraceDataTest {
 		Trace[] traces = TraceData.fetchTraces("GS", "ASA1", "33",
 				"LDF", "2019-01-01 00:00:00.000",
 				"2022-01-01 01:00:00.000", 'M', true, "nobody@iris.edu", "anonymous");
-		for(Trace trace:traces) {
+		for (Trace trace : traces) {
 			System.out.println(trace);
-			assertEquals(4434,trace.getSampleCount());
+			assertEquals(4434, trace.getSampleCount());
 		}
 	}
 
 	@Test
-	public void n()throws Exception{
+	public void n() throws Exception {
 		Trace[] traces = TraceData.fetchTraces("IU", "ANMO", "00", "BHZ",
 				"2022-07-26 00:00:00",
 				"2022-07-28 01:00:00",
 				'M', true, "nobody@iris.edu", "anonymous");
 
-		for(Trace trace:traces) {
+		for (Trace trace : traces) {
 			System.out.println(trace);
 			//assertEquals(72000,trace.getSampleCount());
 		}
@@ -89,11 +89,18 @@ public class TraceDataTest {
 	}
 
 	@Test
-	public void sta()throws Exception{
-		ServiceUtil su=ServiceUtil.getInstance();
-		StationService ss=su.getStationService("http://wsbeta1:8080/fdsnwsbeta/station/1/");
-		System.out.println("base url: "+ss.getBaseUrl());
-		Criteria criteria=StationCriteria.builder().netCode("IU").build();
+	public void sta() throws Exception {
+		ServiceUtil su = ServiceUtil.getInstance();
+		StationService ss = su.getStationService("http://wsbeta1:8080/fdsnwsbeta/station/1/");
+		System.out.println("base url: " + ss.getBaseUrl());
+		Criteria criteria = StationCriteria.builder().netCode("IU").build();
 		ss.fetch(criteria);
+	}
+
+	@Test
+	public void d() throws Exception {
+
+		TraceData.fetchTraces("IM","I51H4","*","BDF",
+			"2015-01-01 00:00:00.000","2015-01-01 01:00:00.000",true);
 	}
 }

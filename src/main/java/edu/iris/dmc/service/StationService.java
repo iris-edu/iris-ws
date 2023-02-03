@@ -291,9 +291,6 @@ public class StationService extends BaseService {
 			}
 		}
 		OutputLevel level = this.extractLevel(queryKeyValue);
-		StationParser parser = null;
-		List<Network> result = null;
-		pair = null;
 		HttpURLConnection connection = this.getConnection(url);
 		connection.setRequestMethod("GET");
 		String uAgent = this.userAgent;
@@ -307,78 +304,35 @@ public class StationService extends BaseService {
 		connection.connect();
 		int responseCode = connection.getResponseCode();
 
-		try {
-			InputStream inputStream = responseCode != 200 ? connection.getErrorStream() : ("gzip".equals(connection.getContentEncoding()) ? new GZIPInputStream(connection.getInputStream()) : connection.getInputStream());
-			Throwable var13 = null;
-
-			try {
-				Object var14;
-				try {
-					switch(responseCode) {
-						case 200:
-							parser = this.getParser((InputStream)inputStream, queryKeyValue, level);
-							result = parser.parse();
-							return result;
-						case 204:
-							if (logger.isLoggable(Level.WARNING)) {
-								logger.warning("No data Found for the GET request " + url);
-							}
-
-							throw new NoDataFoundException("No data found for: " + url);
-						case 400:
-							if (logger.isLoggable(Level.SEVERE)) {
-								logger.severe("An error occurred while making a GET request " + url + StringUtil.toString((InputStream)inputStream));
-							}
-
-							throw new CriteriaException("Bad request parameter: " + StringUtil.toString((InputStream)inputStream));
-						case 404:
-							if (logger.isLoggable(Level.WARNING)) {
-								logger.warning("No data Found for the GET request " + url + StringUtil.toString((InputStream)inputStream));
-							}
-
-							return Collections.emptyList();
-						case 500:
-							if (logger.isLoggable(Level.WARNING)) {
-								logger.severe("An error occurred while making a GET request " + url + StringUtil.toString((InputStream)inputStream));
-							}
-
-							throw new IOException(StringUtil.toString((InputStream)inputStream));
-						default:
-							throw new IOException(connection.getResponseMessage());
+		try(InputStream inputStream = responseCode != 200 ? connection.getErrorStream() :
+				("gzip".equals(connection.getContentEncoding()) ?
+						new GZIPInputStream(connection.getInputStream()) : connection.getInputStream());){
+			switch(responseCode) {
+				case 200:
+					return this.getParser(inputStream, queryKeyValue, level).parse();
+				case 204:
+					if (logger.isLoggable(Level.WARNING)) {
+						logger.warning("No data Found for the GET request " + url);
 					}
-				} catch (Throwable var43) {
-					var14 = var43;
-					var13 = var43;
-					throw var43;
-				}
-			} finally {
-				if (inputStream != null) {
-					if (var13 != null) {
-						try {
-							((InputStream)inputStream).close();
-						} catch (Throwable var42) {
-							var13.addSuppressed(var42);
-						}
-					} else {
-						((InputStream)inputStream).close();
+					throw new NoDataFoundException("No data found for: " + url);
+				case 400:
+					if (logger.isLoggable(Level.SEVERE)) {
+						logger.severe("An error occurred while making a GET request " + url + StringUtil.toString((InputStream)inputStream));
 					}
-				}
-
+					throw new CriteriaException("Bad request parameter: " + StringUtil.toString((InputStream)inputStream));
+				case 404:
+					if (logger.isLoggable(Level.WARNING)) {
+						logger.warning("No data Found for the GET request " + url + StringUtil.toString((InputStream)inputStream));
+					}
+					return Collections.emptyList();
+				case 500:
+					if (logger.isLoggable(Level.WARNING)) {
+						logger.severe("An error occurred while making a GET request " + url + StringUtil.toString((InputStream)inputStream));
+					}
+					throw new IOException(StringUtil.toString((InputStream)inputStream));
+				default:
+					throw new IOException(connection.getResponseMessage());
 			}
-		} finally {
-			if (parser != null) {
-				try {
-					parser.close();
-				} catch (IOException var41) {
-					var41.printStackTrace();
-				}
-			}
-
-			try {
-				connection.disconnect();
-			} catch (Exception ignored) {
-			}
-
 		}
 	}
 
