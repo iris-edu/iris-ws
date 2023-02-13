@@ -12,6 +12,8 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,8 +49,10 @@ public class SacpzService extends BaseService {
             logger.entering(this.getClass().getName(), "fetch(SacpzCriteria criteria)", new Object[]{criteria});
         }
 
-        String paramsString = criteria.toUrlParams().get(0);
-        HttpURLConnection connection = this.getConnection(this.baseUrl + "query?" + paramsString+"&format=sacpz");
+        String paramsString = criteria.toUrlParams().get(0).replace(' ', '-');
+
+        String url = this.baseUrl + "query?" + paramsString+"&format=sacpz";
+        HttpURLConnection connection = this.getConnection(url);
         connection.setRequestProperty("Accept", "application/xml");
         connection.setRequestMethod("GET");
         connection.connect();
@@ -59,6 +63,7 @@ public class SacpzService extends BaseService {
                 case 200:
                     return this.toSacpz(inputStream);
                 case 400:
+                    System.out.println(StringUtil.toString(inputStream));
                     throw new CriteriaException("Bad request parameter: " + criteria);
                 case 404:
                     throw new NoDataFoundException("No data found for: " + criteria);
