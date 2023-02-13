@@ -1,10 +1,7 @@
 package edu.iris.dmc.criteria;
 
 import edu.iris.dmc.ws.util.DateUtil;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.Singular;
+import lombok.*;
 import org.apache.http.client.utils.URIUtils;
 
 import java.text.SimpleDateFormat;
@@ -12,6 +9,8 @@ import java.util.*;
 import java.util.Map.Entry;
 
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 public class StationCriteria implements Criteria {

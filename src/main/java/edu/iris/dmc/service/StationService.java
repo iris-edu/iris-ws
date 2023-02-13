@@ -300,10 +300,12 @@ public class StationService extends BaseService {
 
 		connection.setRequestProperty("User-Agent", uAgent);
 		connection.setRequestProperty("Accept", "application/xml");
-		connection.setRequestProperty("Accept-Encoding", "gzip, deflate");
+		//connection.setRequestProperty("Accept-Encoding", "gzip, deflate");
 		connection.connect();
 		int responseCode = connection.getResponseCode();
+		System.out.println(connection.getHeaderFields());
 
+		System.out.println(url+":"+connection.getContentEncoding());
 		try(InputStream inputStream = responseCode != 200 ? connection.getErrorStream() :
 				("gzip".equals(connection.getContentEncoding()) ?
 						new GZIPInputStream(connection.getInputStream()) : connection.getInputStream());){
