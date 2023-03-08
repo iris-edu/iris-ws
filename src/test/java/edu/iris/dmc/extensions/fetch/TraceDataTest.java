@@ -16,7 +16,11 @@ public class TraceDataTest {
 
 	@Test
 	public void fetchIU() throws Exception {
-		Trace[] traces = TraceData.fetchTraces("IU", "ANMO", "00", "BHZ", "2010-01-01 00:00:00.000",
+		Trace[] traces = TraceData.fetchTraces("IU", "ANMO", "00", "BHZ",
+				"2010-01-01 00:00:00.000", "2010-01-01 01:00:00.000", 'M', false);
+		traces = TraceData.fetchTraces("IU", "ANMO", "00", "BHZ",
+				"2010-01-01 00:00:00.000", "2010-01-01 01:00:00.000", 'M', false);
+		traces = TraceData.fetchTraces("IU", "ANMO", "00", "BHZ", "2010-01-01 00:00:00.000",
 				"2010-01-01 01:00:00.000", 'M', false, null, null);
 
 		for (Trace trace : traces) {

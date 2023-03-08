@@ -10,6 +10,8 @@ import java.util.*;
 @Getter
 @Setter
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class SacpzCriteria implements Criteria {
 	private Date time;
 	private Date startTime;
@@ -39,6 +41,63 @@ public class SacpzCriteria implements Criteria {
 			map.put("location", this.locCodes);
 		}
 		return map;
+	}
+
+	public SacpzCriteria addNetwork(String netCode) {
+		if(netCode==null){
+			return this;
+		}
+		String[]array = netCode.split(",");
+		if(array.length>0){
+			if(this.netCodes==null){
+				this.netCodes=new ArrayList<>();
+			}
+			this.netCodes.addAll(Arrays.asList(array));
+		}
+		return this;
+	}
+
+	public SacpzCriteria addStation(String staCode) {
+		if(staCode==null){
+			return this;
+		}
+		String[]array = staCode.split(",");
+		if(array.length>0){
+			if(this.staCodes==null){
+				this.staCodes=new ArrayList<>();
+			}
+			this.staCodes.addAll(Arrays.asList(array));
+		}
+		return this;
+	}
+
+	public SacpzCriteria addChannel(String channel) {
+		if(channel==null){
+			return this;
+		}
+		String[]array = channel.split(",");
+		if(array.length>0){
+			if(this.chanCodes==null){
+				this.chanCodes=new ArrayList<>();
+			}
+			this.chanCodes.addAll(Arrays.asList(array));
+		}
+		return this;
+	}
+
+	public SacpzCriteria addLocation(String location) {
+		if(location==null){
+			return this;
+		}
+		location = location.replace(" ", "-");
+		String[]array = location.split(",");
+		if(array.length>0){
+			if(this.locCodes==null){
+				this.locCodes=new ArrayList<>();
+			}
+			this.locCodes.addAll(Arrays.asList(array));
+		}
+		return this;
 	}
 
 	public List<String> toUrlParams() throws CriteriaException {
