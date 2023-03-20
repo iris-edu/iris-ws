@@ -58,17 +58,21 @@ public class TraceData {
 		VERBOSE = verbose;
 	}
 
+	public static Trace[] fetchTraces(String network, String station, String location, String channel, String startDateStr, String endDateStr) throws Exception {
+		return fetchTraces(network, station, location, channel, startDateStr, endDateStr, false);
+	}
+
 	public static Trace[] fetchTraces(String network, String station, String location, String channel, String startDateStr, String endDateStr, boolean includePolesZeros) throws Exception {
-		return fetchTraces(network, station, location, channel, startDateStr, endDateStr, null, includePolesZeros,
+		return fetchTraces(network, station, location, channel, startDateStr, endDateStr, includePolesZeros,
 				null, null);
 	}
 
-	public static Trace[] fetchTraces(String network, String station, String location, String channel, String startDateStr, String endDateStr, Character qualityChar, boolean includePolesZeros) throws Exception {
+	public static Trace[] fetchTraces(String network, String station, String location, String channel, String startDateStr, String endDateStr, char qualityChar, boolean includePolesZeros) throws Exception {
 		return fetchTraces(network, station, location, channel, startDateStr, endDateStr, qualityChar, includePolesZeros,
 				null, null);
 	}
 
-	public static Trace[] fetchTraces(String network, String station, String location, String channel, String startDateStr, String endDateStr, Character qualityChar, boolean includePolesZeros, String username, String password) throws Exception {
+	public static Trace[] fetchTraces(String network, String station, String location, String channel, String startDateStr, String endDateStr, char qualityChar, boolean includePolesZeros, String username, String password) throws Exception {
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 		new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS");
 		Date startDate = DateUtil.parseAny(startDateStr);
@@ -76,45 +80,56 @@ public class TraceData {
 		return fetchTraces(network, station, location, channel, startDate, endDate, qualityChar, includePolesZeros, username, password);
 	}
 
-	public static Trace[] fetchTraces(String network, String station, String location, String channel, String startDateStr, String endDateStr, boolean includePolesZeros, String username, String password) throws Exception {
+	public static Trace[] fetchTraces(String network, String station, String location, String channel,
+									  String startDateStr, String endDateStr, boolean includePolesZeros,
+									  String username, String password) throws Exception {
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 		new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS");
 		Date startDate = DateUtil.parseAny(startDateStr);
 		Date endDate = DateUtil.parseAny(endDateStr);
-		return fetchTraces(network, station, location, channel, startDate, endDate, null, includePolesZeros, username, password);
+		return fetchTraces(network, station, location, channel, startDate, endDate, includePolesZeros, username, password);
 	}
 
-	public static Trace[] fetchTraces(String network, String station, String location, String channel, Date startDate, Date endDate, Character qualityChar, boolean includePolesZeros) throws Exception {
+	public static Trace[] fetchTraces(String network, String station, String location, String channel,
+									  Date startDate, Date endDate, char qualityChar,
+									  boolean includePolesZeros) throws Exception {
 		return fetchTraces(network, station, location, channel, startDate, endDate, qualityChar, includePolesZeros, null, null);
 	}
 
-	public static Trace[] fetchTraces(String network, String station, String location, String channel, Date startDate, Date endDate, Character qualityChar, boolean includePolesZeros, String username, String password) throws Exception {
-		//StationCriteria sc = new StationCriteria();
+	public static Trace[] fetchTraces(String network, String station, String location, String channel,
+									  Date startDate, Date endDate,
+									  boolean includePolesZeros, String username, String password) throws Exception {
 		StationCriteria sc = StationCriteria.builder().netCode(network).staCode(station).locCode(location).chanCode(channel).
 				startTime(startDate).endTime(endDate).build();
-		//sc.addNetwork(network).addStation(station).addLocation(location).addChannel(channel);
-		//sc.setStartTime(startDate).setEndTime(endDate);
+		StationCriteria[] asc = new StationCriteria[]{sc};
+		return fetchTraces(asc, username, password, includePolesZeros);
+	}
+	public static Trace[] fetchTraces(String network, String station, String location, String channel,
+									  Date startDate, Date endDate, char qualityChar,
+									  boolean includePolesZeros, String username, String password) throws Exception {
+		StationCriteria sc = StationCriteria.builder().netCode(network).staCode(station).locCode(location).chanCode(channel).
+				startTime(startDate).endTime(endDate).build();
 		StationCriteria[] asc = new StationCriteria[]{sc};
 		return fetchTraces(asc, qualityChar, includePolesZeros, username, password);
 	}
 
 	public static Trace[] fetchTraces(StationCriteria[] aSc, boolean includePolesZeros) throws Exception {
-		return fetchTraces(aSc, null, includePolesZeros, null, null);
+		return fetchTraces(aSc, null, null, includePolesZeros);
 	}
 
 	public static Trace[] fetchTraces(StationCriteria[] aSc, String username, String password, boolean includePolesZeros) throws Exception {
-		return fetchTraces(aSc, null, includePolesZeros, username, password);
+		return fetchTraces(aSc, username, password, includePolesZeros);
 	}
 
-	public static Trace[] fetchTraces(StationCriteria[] aSc, Character qualityChar, boolean includePolesZeros) throws Exception {
+	public static Trace[] fetchTraces(StationCriteria[] aSc, char qualityChar, boolean includePolesZeros) throws Exception {
 		return fetchTraces(aSc, qualityChar, includePolesZeros, null, null);
 	}
 
-	public static Trace[] fetchTraces(StationCriteria[] aSc, Character qualityChar, String username, String password, boolean includePolesZeros) throws IOException, NoDataFoundException, CriteriaException, Exception {
+	public static Trace[] fetchTraces(StationCriteria[] aSc, char qualityChar, String username, String password, boolean includePolesZeros) throws IOException, NoDataFoundException, CriteriaException, Exception {
 		return fetchTraces(aSc, qualityChar, includePolesZeros, username, password);
 	}
 
-	public static Trace[] fetchTraces(StationCriteria[] aSc, Character qualityChar, boolean includePolesZeros, String username, String password) throws IOException, NoDataFoundException, CriteriaException, Exception {
+	public static Trace[] fetchTraces(StationCriteria[] aSc, char qualityChar, boolean includePolesZeros, String username, String password) throws IOException, NoDataFoundException, CriteriaException, Exception {
 		DateFormat sdfm = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 		List<Trace> lTraces = new ArrayList<>();
 		ServiceUtil serviceUtil;
@@ -163,9 +178,7 @@ public class TraceData {
 			}
 			ws.setAppName(APP_NAME);
 			WaveformCriteria wc = new WaveformCriteria();
-			if (qualityChar != null) {
-				wc.setQuality(QualityLookup.getQualityFromChar(qualityChar));
-			}
+			wc.setQuality(QualityLookup.getQualityFromChar(qualityChar));
 			for (Metadata md : lmd) {
 				Date segStartDate;
 				Date segEndDate;
@@ -201,7 +214,7 @@ public class TraceData {
 				} else {
 					lts = ws.fetch(wc);
 				}
-			} catch (NoDataFoundException var27) {
+			} catch (NoDataFoundException e) {
 				usrMessage("No data found for \n" + wc);
 				continue;
 			}
@@ -285,19 +298,19 @@ public class TraceData {
 		}
 	}
 
-	public static void setBaseUrl(String baseUrl) {
+	public static void setBASE_URL(String baseUrl) {
 		BASE_URL = baseUrl;
 	}
 
-	public static void setSacpzUrl(String sacpzUrl) {
+	public static void setSACPZ_URL(String sacpzUrl) {
 		SACPZ_URL = sacpzUrl;
 	}
 
-	public static void setStationUrl(String stationUrl) {
+	public static void setSTATION_URL(String stationUrl) {
 		STATION_URL = stationUrl;
 	}
 
-	public static void setWaveformUrl(String waveformUrl) {
+	public static void setWAVEFORM_URL(String waveformUrl) {
 		WAVEFORM_URL = waveformUrl;
 	}
 }
