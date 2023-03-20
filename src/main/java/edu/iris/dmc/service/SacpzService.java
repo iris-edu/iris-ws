@@ -63,7 +63,6 @@ public class SacpzService extends BaseService {
                 case 200:
                     return this.toSacpz(inputStream);
                 case 400:
-                    System.out.println(StringUtil.toString(inputStream));
                     throw new CriteriaException("Bad request parameter: " + criteria);
                 case 404:
                     throw new NoDataFoundException("No data found for: " + criteria);
